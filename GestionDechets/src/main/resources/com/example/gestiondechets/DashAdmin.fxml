@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane fx:id="adminRoot" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.DashAdminController">
+
+    <!-- Menu latéral -->
+    <AnchorPane prefHeight="700.0" prefWidth="250" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0.0">
+
+        <!-- Utilisateurs -->
+        <Button fx:id="usersBtn" layoutY="235.0" onAction="#showUsers" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="235.0">
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Signalements -->
+        <Button fx:id="signalementsBtn" layoutY="167.0" onAction="#showSignalements" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Signalements" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="167.0">
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Rapports -->
+        <Button fx:id="reportsBtn" layoutY="303.0" onAction="#showReports" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Rapports" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="303.0">
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Paramètres -->
+        <Button fx:id="settingsBtn" layoutY="375.0" onAction="#showSettings" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Paramétres" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="375.0">
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Copyright -->
+        <Label alignment="CENTER" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;" text="© 2025 Gestion de Déchets" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+      <Button layoutX="64.0" layoutY="596.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-radius: 5; -fx-border-color: white;" text="Déconnexion" />
+      <Label fx:id="userNameLabel" layoutX="45.0" layoutY="27.0" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Admin : Administrateur" />
+      <Button fx:id="dashboard" contentDisplay="LEFT" layoutY="97.0" prefHeight="50" prefWidth="252.0" style="-fx-background-color: #34495e; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Acceuil">
+         <padding>
+            <Insets left="20" />
+         </padding>
+      </Button>
+
+    </AnchorPane>
+
+    <!-- Contenu principal -->
+    <AnchorPane fx:id="contentPane" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="250" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="70">
+
+        <!-- Dashboard View -->
+        <AnchorPane fx:id="dashboardView" visible="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+
+            <!-- Carte Signalements -->
+            <AnchorPane prefHeight="120" prefWidth="200" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20">
+                <Circle fill="#3498db" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
+                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Signalements" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
+                <Label fx:id="signalementsCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
+                <Label fx:id="signalementsLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Aujourd'hui: 0" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
+            </AnchorPane>
+
+            <!-- Carte Collectes -->
+            <AnchorPane prefHeight="120" prefWidth="200" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="240" AnchorPane.topAnchor="20">
+                <Circle fill="#2ecc71" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
+                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Collectes" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
+                <Label fx:id="collectesCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
+                <Label fx:id="collectesLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Aujourd'hui: 0" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
+            </AnchorPane>
+
+            <!-- Carte Utilisateurs -->
+            <AnchorPane prefHeight="120" prefWidth="200" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="460" AnchorPane.topAnchor="20">
+                <Circle fill="#e74c3c" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
+                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Utilisateurs" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
+                <Label fx:id="usersCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
+                <Label fx:id="usersLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Actifs: 0" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
+            </AnchorPane>
+
+            <!-- Carte Recyclage -->
+            <AnchorPane prefHeight="120" prefWidth="200" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="680" AnchorPane.topAnchor="20">
+                <Circle fill="#f39c12" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
+                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Déchets recyclés" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
+                <Label fx:id="recyclingCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
+                <Label fx:id="recyclingLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Mois en cours" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
+            </AnchorPane>
+
+            <!-- Tableau Signalements récents -->
+            <AnchorPane style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="160">
+                <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Signalements récents" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+                <TableView fx:id="recentSignalementsTable" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="60">
+                    <columns>
+                        <TableColumn prefWidth="50" text="ID" />
+                        <TableColumn prefWidth="100" text="Date" />
+                        <TableColumn prefWidth="100" text="Type" />
+                        <TableColumn prefWidth="150" text="Localisation" />
+                        <TableColumn prefWidth="80" text="État" />
+                    </columns>
+                </TableView>
+            </AnchorPane>
+
+        </AnchorPane>
+
+        <!-- Users View -->
+        <AnchorPane fx:id="usersView" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+
+            <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+            <!-- Barre d'outils -->
+            <Button fx:id="addUserBtn" onAction="#addNewUser" prefHeight="35" prefWidth="150" style="-fx-background-color: #006666; -fx-text-fill: white; -fx-background-radius: 5;" text="+ Nouvel utilisateur" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20" />
+
+            <!-- Filtres -->
+            <TextField fx:id="searchField" prefHeight="35" prefWidth="200" promptText="Rechercher..." AnchorPane.leftAnchor="20" AnchorPane.topAnchor="70" />
+
+            <ComboBox fx:id="roleFilter" prefHeight="35" prefWidth="120" promptText="Rôle" AnchorPane.leftAnchor="240" AnchorPane.topAnchor="70">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Tous" />
+                        <String fx:value="Citoyen" />
+                        <String fx:value="Conducteur" />
+                        <String fx:value="Agent" />
+                        <String fx:value="Admin" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+
+            <ComboBox fx:id="statusFilter" prefHeight="35" prefWidth="120" promptText="Statut" AnchorPane.leftAnchor="380" AnchorPane.topAnchor="70">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Tous" />
+                        <String fx:value="Actif" />
+                        <String fx:value="Inactif" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+
+            <Button fx:id="filterBtn" onAction="#filterUsers" prefHeight="35" prefWidth="80" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="Filtrer" AnchorPane.leftAnchor="520" AnchorPane.topAnchor="70" />
+
+            <!-- Tableau utilisateurs -->
+            <TableView fx:id="usersTable" AnchorPane.bottomAnchor="70" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="120">
+                <columns>
+                    <TableColumn prefWidth="50" text="ID" />
+                    <TableColumn prefWidth="150" text="Nom" />
+                    <TableColumn prefWidth="200" text="Email" />
+                    <TableColumn prefWidth="100" text="Téléphone" />
+                    <TableColumn prefWidth="100" text="Rôle" />
+                    <TableColumn prefWidth="100" text="Date création" />
+                    <TableColumn prefWidth="80" text="Statut" />
+                    <TableColumn prefWidth="150" text="Actions" />
+                </columns>
+            </TableView>
+
+        </AnchorPane>
+
+        <!-- Settings View -->
+        <AnchorPane fx:id="settingsView" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+
+            <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+
+                <AnchorPane prefHeight="800" prefWidth="700">
+
+                    <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Paramètres du système" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+                    <!-- Paramètres généraux -->
+                    <AnchorPane prefHeight="200" prefWidth="660" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="70">
+
+                        <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Paramètres généraux" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+                        <Label prefWidth="150" text="Nom de l'application:" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="60" />
+
+                        <TextField fx:id="appNameField" prefHeight="30" prefWidth="300" text="Gestion des Déchets" AnchorPane.leftAnchor="180" AnchorPane.topAnchor="55" />
+
+                        <Label prefWidth="150" text="Notifications:" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="100" />
+
+                        <CheckBox fx:id="notificationsCheck" text="Activer les notifications" AnchorPane.leftAnchor="180" AnchorPane.topAnchor="100" />
+
+                        <Label prefWidth="150" text="Langue:" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="140" />
+
+                        <ComboBox fx:id="languageCombo" prefHeight="30" prefWidth="200" AnchorPane.leftAnchor="180" AnchorPane.topAnchor="135">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Français" />
+                                    <String fx:value="Anglais" />
+                                    <String fx:value="Arabe" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+
+                        <Button fx:id="saveSettingsBtn" onAction="#saveSettings" prefHeight="35" prefWidth="180" style="-fx-background-color: #006666; -fx-text-fill: white; -fx-background-radius: 5;" text="Enregistrer les modifications" AnchorPane.bottomAnchor="20" AnchorPane.rightAnchor="20" />
+
+                    </AnchorPane>
+
+                    <!-- Paramètres de sécurité -->
+                    <AnchorPane prefHeight="180" prefWidth="660" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="290">
+
+                        <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Sécurité" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+                        <Label prefWidth="150" text="Durée session:" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="60" />
+
+                        <TextField fx:id="sessionDurationField" prefHeight="30" prefWidth="100" text="30" AnchorPane.leftAnchor="180" AnchorPane.topAnchor="55" />
+
+                        <Label text="minutes" AnchorPane.leftAnchor="290" AnchorPane.topAnchor="60" />
+
+                        <Label prefWidth="150" text="Force mot de passe:" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="100" />
+
+                        <CheckBox fx:id="uppercaseCheck" text="Exiger majuscules" AnchorPane.leftAnchor="180" AnchorPane.topAnchor="100" />
+
+                        <CheckBox fx:id="numbersCheck" text="Exiger chiffres" AnchorPane.leftAnchor="320" AnchorPane.topAnchor="100" />
+
+                        <CheckBox fx:id="lengthCheck" text="Longueur min: 8" AnchorPane.leftAnchor="460" AnchorPane.topAnchor="100" />
+
+                    </AnchorPane>
+
+                </AnchorPane>
+
+            </ScrollPane>
+
+        </AnchorPane>
+
+    </AnchorPane>
+
+        <!-- Titre -->
+     <Label layoutX="280.0" layoutY="26.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Admin Dashboard" textFill="#006666" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="26.0" />
+
+</AnchorPane>

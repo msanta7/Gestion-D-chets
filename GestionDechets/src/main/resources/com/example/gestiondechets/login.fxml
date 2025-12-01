@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="mainAnchore" prefHeight="608.0" prefWidth="900.0" style="-fx-background-color: rgb(0, 102, 102);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.LoginController">
+
+    <!-- Panneau droit (Formulaire) -->
+    <AnchorPane layoutX="420.0" layoutY="-2.0" prefHeight="614.0" prefWidth="438.0" style="-fx-background-color: rgba(255, 255, 255, 0.95); -fx-background-radius: 0 20 20 0;" AnchorPane.bottomAnchor="-4.0" AnchorPane.rightAnchor="-6.0" AnchorPane.topAnchor="-2.0">
+
+        <!-- Titre CONNEXION -->
+        <Label alignment="CENTER" layoutX="50.0" layoutY="83.0" text="CONNEXION" textFill="#006666" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="83.0">
+            <font>
+                <Font name="System Bold" size="28" />
+            </font>
+            <style>
+                .label {
+                -fx-text-fill: #006666;
+                }
+            </style>
+        </Label>
+
+        <!-- Champ Numéro de téléphone -->
+        <Label layoutX="50.0" layoutY="172.0" text="Numéro de téléphone" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="172.0">
+            <font>
+                <Font name="System" size="14" />
+            </font>
+            <style>
+                .label {
+                -fx-text-fill: #333333;
+                }
+            </style>
+        </Label>
+
+        <TextField fx:id="telephoneField" layoutX="50.0" layoutY="202.0" prefHeight="45" promptText="Votre numéro de téléphone" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="202.0">
+            <style>
+                .text-field {
+                -fx-background-color: white;
+                -fx-background-radius: 10;
+                -fx-border-color: #cccccc;
+                -fx-border-radius: 10;
+                -fx-border-width: 1;
+                -fx-padding: 0 15 0 15;
+                -fx-font-size: 14px;
+                }
+                .text-field:focused {
+                -fx-border-color: #4CAF50;
+                -fx-border-width: 2;
+                }
+            </style>
+        </TextField>
+
+        <!-- Champ Mot de passe -->
+        <Label layoutX="50.0" layoutY="272.0" text="Mot de passe" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="272.0">
+            <font>
+                <Font name="System" size="14" />
+            </font>
+            <style>
+                .label {
+                -fx-text-fill: #333333;
+                }
+            </style>
+        </Label>
+
+        <PasswordField fx:id="passwordField" layoutX="50.0" layoutY="302.0" prefHeight="45" promptText="Votre mot de passe" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="302.0">
+            <style>
+                .password-field {
+                -fx-background-color: white;
+                -fx-background-radius: 10;
+                -fx-border-color: #cccccc;
+                -fx-border-radius: 10;
+                -fx-border-width: 1;
+                -fx-padding: 0 15 0 15;
+                -fx-font-size: 14px;
+                }
+                .password-field:focused {
+                -fx-border-color: #4CAF50;
+                -fx-border-width: 2;
+                }
+            </style>
+        </PasswordField>
+
+        <Button fx:id="loginButton" layoutX="51.0" layoutY="380.0" onAction="#handleLogin" prefHeight="40" prefWidth="120" style="-fx-background-color: #006666; -fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-font-weight: normal; -fx-background-radius: 0; -fx-border-color: transparent; -fx-border-width: 0; -fx-padding: 10px 0px; -fx-cursor: hand;" text="Se Connecter" textFill="WHITE" />
+
+
+    </AnchorPane>
+   <Text fill="WHITE" layoutX="96.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Gestion de Déchets">
+      <font>
+         <Font name="Showcard Gothic" size="26.0" />
+      </font>
+   </Text>
+   <Text fill="#d0c6c6" layoutX="132.0" layoutY="544.0" strokeType="OUTSIDE" strokeWidth="0.0" text="copyright © Gestion Déchets 2025" wrappingWidth="190.0" />
+   <ImageView id="logo" fitHeight="150.0" fitWidth="200.0" layoutX="148.0" layoutY="106.0" pickOnBounds="true" preserveRatio="true">
+      <image>
+         <Image url="@../../../images/logo.png" />
+      </image>
+   </ImageView>
+
+</AnchorPane>

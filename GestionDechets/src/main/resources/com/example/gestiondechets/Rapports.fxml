@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane fx:id="adminRoot" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.RapportsController">
+
+    <!-- Menu latéral -->
+    <AnchorPane prefHeight="700.0" prefWidth="250" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0.0">
+
+        <!-- Admin label -->
+        <Label fx:id="userNameLabel" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Admin : Administrateur" AnchorPane.leftAnchor="45" AnchorPane.topAnchor="27" />
+
+        <!-- Accueil -->
+        <Button fx:id="dashboardBtn" layoutY="97.0" onAction="#showDashboard" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Acceuil" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="97.0">
+
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Signalements -->
+        <Button fx:id="signalementsBtn" layoutY="167.0" onAction="#showSignalements" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Signalements" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="167.0">
+
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Utilisateurs -->
+        <Button fx:id="usersBtn" layoutY="235.0" onAction="#showUsers" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="235.0">
+
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Rapports -->
+        <Button fx:id="reportsBtn" layoutY="303.0" onAction="#showReports" prefHeight="50" prefWidth="250" style="-fx-background-color: #34495e; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Rapports" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="303.0">
+
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Paramètres -->
+        <Button fx:id="settingsBtn" layoutY="375.0" onAction="#showSettings" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Paramétres" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="375.0">
+
+            <padding>
+                <Insets left="20" />
+            </padding>
+            <contentDisplay>LEFT</contentDisplay>
+        </Button>
+
+        <!-- Bouton Déconnexion -->
+        <Button layoutY="596.0" onAction="#handleLogout" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-radius: 5; -fx-border-color: white;" text="Déconnexion" AnchorPane.bottomAnchor="74" AnchorPane.leftAnchor="64" />
+
+        <!-- Copyright -->
+        <Label alignment="CENTER" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;" text="© 2025 Gestion de Déchets" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
+
+    </AnchorPane>
+
+    <!-- Contenu principal - Rapports -->
+    <AnchorPane layoutX="250.0" layoutY="14.0" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0">
+
+        <!-- En-tête de la page -->
+        <Label layoutX="30.0" layoutY="14.0" style="-fx-text-fill: #006666; -fx-font-size: 24px; -fx-font-weight: bold;" text="GÉNÉRATION DES RAPPORTS" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="14.0" />
+
+        <!-- Filtres de période -->
+        <AnchorPane prefHeight="100" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="30" AnchorPane.rightAnchor="30" AnchorPane.topAnchor="70">
+
+            <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Sélectionner la période" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+            <!-- Type de période -->
+            <RadioButton fx:id="dailyRadio" layoutX="20.0" layoutY="55.0" text="Journalier" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="weeklyRadio" layoutX="120.0" layoutY="55.0" text="Hebdomadaire" AnchorPane.leftAnchor="120" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="monthlyRadio" layoutX="240.0" layoutY="55.0" text="Mensuel" AnchorPane.leftAnchor="240" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="yearlyRadio" layoutX="340.0" layoutY="55.0" text="Annuel" AnchorPane.leftAnchor="340" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="customRadio" layoutX="440.0" layoutY="55.0" text="Personnalisé" AnchorPane.leftAnchor="440" AnchorPane.topAnchor="55" />
+
+            <!-- Dates personnalisées -->
+            <Label fx:id="startDateLabel" layoutX="560.0" layoutY="60.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Du:" AnchorPane.leftAnchor="560" AnchorPane.topAnchor="60" />
+            <DatePicker fx:id="startDatePicker" layoutX="590.0" layoutY="55.0" prefHeight="30" prefWidth="120" AnchorPane.leftAnchor="590" AnchorPane.topAnchor="55" />
+
+            <Label fx:id="endDateLabel" layoutX="730.0" layoutY="60.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Au:" AnchorPane.leftAnchor="730" AnchorPane.topAnchor="60" />
+            <DatePicker fx:id="endDatePicker" layoutX="760.0" layoutY="55.0" prefHeight="30" prefWidth="120" AnchorPane.leftAnchor="760" AnchorPane.topAnchor="55" />
+
+        </AnchorPane>
+
+        <!-- Types de rapports -->
+        <AnchorPane prefHeight="150" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="30" AnchorPane.rightAnchor="30" AnchorPane.topAnchor="190">
+
+            <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Type de rapport" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+
+            <!-- Options de rapport -->
+            <RadioButton fx:id="signalementsReport" layoutX="20.0" layoutY="55.0" prefWidth="200" text="Rapport des Signalements" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="collectesReport" layoutX="240.0" layoutY="55.0" prefWidth="200" text="Rapport des Collectes" AnchorPane.leftAnchor="240" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="dechetsReport" layoutX="460.0" layoutY="55.0" prefWidth="200" text="Rapport des Déchets" AnchorPane.leftAnchor="460" AnchorPane.topAnchor="55" />
+            <RadioButton fx:id="recyclageReport" layoutX="20.0" layoutY="95.0" prefWidth="200" text="Rapport de Recyclage" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="95.0" />
+
+            <!-- Bouton générer -->
+            <Button fx:id="generateBtn" layoutX="680.0" layoutY="75.0" onAction="#generateReport" prefHeight="40" prefWidth="180" style="-fx-background-color: #006666; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-weight: bold; -fx-font-size: 14px;" text="Générer Rapport" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="75" />
+
+        </AnchorPane>
+
+        <!-- Statistiques rapides -->
+        <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 18px; -fx-font-weight: bold;" text="Statistiques du mois en cours" AnchorPane.leftAnchor="30" AnchorPane.topAnchor="360" />
+
+        <!-- Cartes statistiques -->
+        <AnchorPane prefHeight="100" prefWidth="180" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="30" AnchorPane.topAnchor="400">
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#3498db" height="5.0" width="180.0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Signalements" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+            <Label fx:id="monthSignalements" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="40" />
+        </AnchorPane>
+
+        <AnchorPane prefHeight="100" prefWidth="180" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="230" AnchorPane.topAnchor="400">
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#2ecc71" height="5.0" width="180.0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Collectes" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+            <Label fx:id="monthCollectes" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="40" />
+        </AnchorPane>
+
+        <AnchorPane prefHeight="100" prefWidth="180" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="430" AnchorPane.topAnchor="400">
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e74c3c" height="5.0" width="180.0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Déchets triés" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+            <Label fx:id="monthDechets" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="40" />
+        </AnchorPane>
+
+        <AnchorPane prefHeight="100" prefWidth="180" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="630" AnchorPane.topAnchor="400">
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f39c12" height="5.0" width="180.0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Taux recyclage" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
+            <Label fx:id="monthRecyclage" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0%" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="40" />
+        </AnchorPane>
+
+    </AnchorPane>
+
+</AnchorPane>

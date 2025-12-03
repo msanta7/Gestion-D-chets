@@ -3,6 +3,7 @@ package com.example.gestiondechets;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -12,6 +13,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -228,11 +231,11 @@ public class DashConducteurController implements Initializable {
     private void showCollecte() {
         try {
             // Charger le nouveau fichier FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("effectuer-collecte.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("historique-collecte.fxml"));
             Parent root = loader.load();
 
             // Obtenir la scène actuelle
-            Stage stage = (Stage) collecteBtn.getScene().getWindow(); // Remplacez "collecteButton" par votre bouton
+            Stage stage = (Stage) collecteBtn.getScene().getWindow();
             Scene scene = new Scene(root);
 
             // Changer la scène
@@ -247,10 +250,18 @@ public class DashConducteurController implements Initializable {
 
     @FXML
     private void showSignalements() {
-        // Logique pour afficher les signalements assignés
-        System.out.println("Signalements clicked");
-        // Ici, vous pouvez ouvrir une nouvelle vue pour les signalements
-        showAlert("Information", "Fonctionnalité Signalements à implémenter", Alert.AlertType.INFORMATION);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("signalements-conducteur.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) signalementsBtn.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger la page des signalements", Alert.AlertType.ERROR);
+        }
     }
 
     @FXML
@@ -639,29 +650,6 @@ public class DashConducteurController implements Initializable {
         alert.showAndWait();
     }
 
-    // Méthodes pour mettre à jour les données depuis la base (à implémenter avec JDBC)
-    public void chargerInterventionsDepuisBase() {
-        // TODO: Implémenter le chargement depuis la base de données
-        // Utiliser JDBC pour récupérer les interventions du conducteur connecté
-    }
-
-    public void sauvegarderInterventionDansBase(Intervention intervention) {
-        // TODO: Implémenter la sauvegarde dans la base de données
-        // Utiliser JDBC pour insérer/mettre à jour l'intervention
-    }
-
-    // Getters et Setters
-    public int getIdConducteurConnecte() {
-        return idConducteurConnecte;
-    }
-
-    public void setIdConducteurConnecte(int idConducteurConnecte) {
-        this.idConducteurConnecte = idConducteurConnecte;
-    }
-
-    public ObservableList<Intervention> getInterventionsList() {
-        return interventionsList;
-    }
 
     public void setInterventionsList(ObservableList<Intervention> interventionsList) {
         this.interventionsList = interventionsList;

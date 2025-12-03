@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.SignalementsConducteurController">
+
+    <!-- Menu latéral -->
+    <AnchorPane prefWidth="220.0" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- En-tête profil -->
+        <Circle fill="white" radius="40.0" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="40.0" />
+        <Label style="-fx-font-size: 32px;" text="🚚" AnchorPane.leftAnchor="90.0" AnchorPane.topAnchor="60.0" />
+
+        <Label fx:id="nomConducteurLabel" prefHeight="30.0" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-alignment: CENTER;" text="Conducteur" wrapText="true" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="130.0" />
+
+        <Separator prefWidth="180.0" style="-fx-background-color: rgba(255,255,255,0.3);" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="170.0" />
+
+        <!-- Menu navigation -->
+        <Button fx:id="dashboardBtn" onAction="#showDashboard" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Tableau de bord" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="190.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <Button fx:id="collecteBtn" onAction="#showCollecte" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Effectuer collecte" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="240.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <Button fx:id="signalementsBtn" onAction="#showSignalements" prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px;" text="Signalements assignés" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="290.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <!-- Déconnexion -->
+        <Button onAction="#handleLogout" prefHeight="35.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-radius: 5; -fx-border-color: white;" text="Déconnexion" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+
+    </AnchorPane>
+
+    <!-- Contenu principal -->
+    <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- Header avec titre -->
+        <Label style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Signalements Assignés - Conducteur" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
+
+        <!-- Section Signalements -->
+        <Label layoutX="30.0" layoutY="101.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Liste des Signalements Assignés" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="101.0" />
+
+        <!-- Tableau des signalements -->
+        <TableView fx:id="signalementsTable" layoutX="30.0" layoutY="151.0" prefHeight="531.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10;" AnchorPane.bottomAnchor="18.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="151.0">
+            <columns>
+                <TableColumn fx:id="idCol" prefWidth="80.0" text="ID" />
+                <TableColumn fx:id="dateCol" prefWidth="150.0" text="Date Signalement" />
+                <TableColumn fx:id="adresseCol" prefWidth="250.0" text="Adresse" />
+                <TableColumn fx:id="descriptionCol" prefWidth="250.0" text="Description" />
+                <TableColumn fx:id="statutCol" prefWidth="189.0" text="Statut" />
+            </columns>
+        </TableView>
+
+    </AnchorPane>
+
+</AnchorPane>

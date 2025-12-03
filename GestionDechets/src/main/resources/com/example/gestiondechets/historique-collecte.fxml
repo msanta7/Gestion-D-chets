@@ -25,19 +25,19 @@
         <Separator prefWidth="180.0" style="-fx-background-color: rgba(255,255,255,0.3);" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="170.0" />
 
         <!-- Menu navigation -->
-        <Button onAction="#retourDashboard" prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px;" text="← Retour" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="190.0">
+        <Button fx:id="retour" onAction="#retourDashboard" prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px;" text="← Retour" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="190.0">
             <padding>
                 <Insets left="15.0" />
             </padding>
         </Button>
 
-        <Button onAction="#effectuerNouvelleCollecte" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="+ Nouvelle Collecte" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="240.0">
+        <Button onAction="#ouvrirPopupNouvelleCollecte" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="+ Nouvelle Collecte" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="240.0">
             <padding>
                 <Insets left="15.0" />
             </padding>
         </Button>
 
-        <Button onAction="#historiqueCollectes" prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Historique" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="290.0">
+        <Button prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Historique" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="290.0">
             <padding>
                 <Insets left="15.0" />
             </padding>
@@ -55,12 +55,10 @@
         <Label style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Historique des Collectes" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
 
         <!-- Tableau des collectes -->
-        <AnchorPane layoutY="79.0" prefHeight="591.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="79.0">
+        <AnchorPane layoutY="72.0" prefHeight="598.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="72.0">
 
             <!-- En-tête du tableau -->
             <Label style="-fx-text-fill: #006666; -fx-font-size: 18px; -fx-font-weight: bold;" text="Liste des Collectes" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
-
-            <Label fx:id="nombreResultatsLabel" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="0 collectes trouvées" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="25.0" />
 
             <!-- TableView -->
             <TableView fx:id="collectesTableView" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
@@ -82,19 +80,19 @@
                     <!-- Adresse -->
                     <TableColumn fx:id="adresseColonne" prefWidth="200" text="Adresse">
                         <cellValueFactory>
-                            <PropertyValueFactory property="adresse" />
+                            <PropertyValueFactory property="idIntervention" />
                         </cellValueFactory>
                     </TableColumn>
 
                     <!-- Date Collecte -->
-                    <TableColumn fx:id="dateColonne" prefWidth="120" text="Date Collecte">
+                    <TableColumn fx:id="dateColonne" prefWidth="150" text="Date Collecte">
                         <cellValueFactory>
                             <PropertyValueFactory property="dateCollecte" />
                         </cellValueFactory>
                     </TableColumn>
 
                     <!-- Quantité -->
-                    <TableColumn fx:id="quantiteColonne" prefWidth="100" text="Quantité (kg)">
+                    <TableColumn fx:id="quantiteColonne" prefWidth="120" text="Quantité (kg)">
                         <cellValueFactory>
                             <PropertyValueFactory property="quantiteCollectee" />
                         </cellValueFactory>
@@ -103,21 +101,14 @@
                     <!-- Statut -->
                     <TableColumn fx:id="statutColonne" prefWidth="100" text="Statut">
                         <cellValueFactory>
-                            <PropertyValueFactory property="statut" />
+                            <PropertyValueFactory property="idIntervention" />
                         </cellValueFactory>
                     </TableColumn>
 
                     <!-- Agent -->
-                    <TableColumn fx:id="agentColonne" prefWidth="150" text="Agent Collecteur">
+                    <TableColumn fx:id="agentColonne" prefWidth="120" text="Agent">
                         <cellValueFactory>
-                            <PropertyValueFactory property="nomAgent" />
-                        </cellValueFactory>
-                    </TableColumn>
-
-                    <!-- Actions -->
-                    <TableColumn fx:id="actionsColonne" prefWidth="120" text="Actions">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="actions" />
+                            <PropertyValueFactory property="idAgentCollecteur" />
                         </cellValueFactory>
                     </TableColumn>
                 </columns>
@@ -137,7 +128,7 @@
             </Button>
 
             <!-- Message d'information -->
-            <Label fx:id="messageLabel" style="-fx-font-size: 14px;" wrapText="true" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+            <Label fx:id="messageLabel" style="-fx-font-size: 14px;" wrapText="true" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
 
         </AnchorPane>
 

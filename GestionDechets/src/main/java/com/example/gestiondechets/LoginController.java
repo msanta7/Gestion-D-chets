@@ -103,7 +103,7 @@ public class LoginController {
             } else if (role.equals("CITOYEN")) {
                 chargerPage("/com/example/gestiondechets/DashCitoyen.fxml");
             } else if (role.equals("AGENT")) {
-                chargerPage("/com/example/gestiondechets/DashAgent.fxml");
+                chargerPage("/com/example/gestiondechets/DashTri.fxml");
             } else if (role.equals("CONDUCTEUR")) {
                 chargerPage("/com/example/gestiondechets/DashConducteur.fxml");
             }

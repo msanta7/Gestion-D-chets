@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.lang.String?>
+<AnchorPane prefHeight="550.0" prefWidth="500.0"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.gestiondechets.AddUserController">
+
+    <!-- En-tête -->
+    <AnchorPane prefHeight="60.0" prefWidth="500.0" style="-fx-background-color: #006666;">
+        <Label layoutX="20.0" layoutY="15.0" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"
+               text="Nouvel Utilisateur" />
+        <Button layoutX="450.0" layoutY="15.0" onAction="#fermerPopup"
+                style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+    </AnchorPane>
+
+    <!-- Formulaire -->
+    <ScrollPane layoutY="60.0" prefHeight="440.0" prefWidth="500.0" fitToWidth="true">
+        <AnchorPane prefHeight="650.0" prefWidth="480.0">
+
+            <!-- Section Informations personnelles -->
+            <Label layoutX="20.0" layoutY="20.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 18px; -fx-font-weight: bold;"
+                   text="Informations personnelles" />
+
+            <!-- Nom -->
+            <Label layoutX="20.0" layoutY="70.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Nom:" />
+            <TextField fx:id="nomField" layoutX="150.0" layoutY="65.0" prefWidth="300.0"
+                       promptText="Nom de famille" />
+
+            <!-- Prénom -->
+            <Label layoutX="20.0" layoutY="120.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Prénom:" />
+            <TextField fx:id="prenomField" layoutX="150.0" layoutY="115.0" prefWidth="300.0"
+                       promptText="Prénom" />
+
+            <!-- Téléphone -->
+            <Label layoutX="20.0" layoutY="170.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Téléphone:" />
+            <TextField fx:id="telephoneField" layoutX="150.0" layoutY="165.0" prefWidth="300.0"
+                       promptText="05XXXXXXXX" />
+
+            <!-- Adresse -->
+            <Label layoutX="20.0" layoutY="220.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Adresse:" />
+            <TextArea fx:id="adresseField" layoutX="150.0" layoutY="215.0" prefWidth="300.0" prefHeight="80.0"
+                      promptText="Adresse complète" wrapText="true" />
+
+            <!-- Section Rôle -->
+            <Label layoutX="20.0" layoutY="320.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 18px; -fx-font-weight: bold;"
+                   text="Rôle" />
+
+            <!-- Rôle -->
+            <Label layoutX="20.0" layoutY="370.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Rôle:" />
+            <ComboBox fx:id="roleCombo" layoutX="150.0" layoutY="365.0" prefWidth="300.0"
+                      promptText="Sélectionner un rôle">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <!-- Correspond aux valeurs ENUM de la table -->
+                        <String fx:value="citoyen" />
+                        <String fx:value="conducteur" />
+                        <String fx:value="agent_tri" />
+                        <String fx:value="administrateur" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+
+            <!-- Section Mot de passe -->
+            <Label layoutX="20.0" layoutY="430.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 18px; -fx-font-weight: bold;"
+                   text="Mot de passe" />
+
+            <!-- Mot de passe -->
+            <Label layoutX="20.0" layoutY="480.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Mot de passe:" />
+            <PasswordField fx:id="passwordField" layoutX="150.0" layoutY="475.0" prefWidth="300.0"
+                           promptText="Mot de passe" />
+
+            <!-- Confirmation mot de passe -->
+            <Label layoutX="20.0" layoutY="530.0" prefWidth="120.0" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;"
+                   text="Confirmation:" />
+            <PasswordField fx:id="confirmPasswordField" layoutX="150.0" layoutY="525.0" prefWidth="300.0"
+                           promptText="Confirmer le mot de passe" />
+
+        </AnchorPane>
+    </ScrollPane>
+
+    <!-- Boutons -->
+    <AnchorPane layoutY="500.0" prefHeight="50.0" prefWidth="500.0"
+                style="-fx-background-color: #f8f9fa; -fx-border-color: #eee; -fx-border-width: 1 0 0 0;">
+        <HBox layoutX="130.0" layoutY="10.0" spacing="20.0">
+            <Button onAction="#fermerPopup" prefWidth="120.0" prefHeight="35.0"
+                    style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;"
+                    text="Annuler" />
+            <Button fx:id="btnAjouter" onAction="#ajouterUtilisateur" prefWidth="120.0" prefHeight="35.0"
+                    style="-fx-background-color: #006666; -fx-text-fill: white; -fx-background-radius: 5;"
+                    text="Ajouter" />
+        </HBox>
+    </AnchorPane>
+
+</AnchorPane>

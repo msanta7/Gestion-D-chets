@@ -120,12 +120,11 @@
             <!-- Tableau des signalements récents -->
             <TableView fx:id="recentSignalementsTable" prefHeight="347.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10;">
                 <columns>
-                    <TableColumn prefWidth="80" text="ID" />
-                    <TableColumn prefWidth="120" text="Date" />
-                    <TableColumn prefWidth="200" text="Adresse" />
-                    <TableColumn prefWidth="100" text="Type" />
-                    <TableColumn prefWidth="100" text="Statut" />
-                    <TableColumn prefWidth="150" text="Actions" />
+                    <TableColumn fx:id="idSignalement" prefWidth="80" text="ID" />
+                    <TableColumn fx:id="dateSignalement" prefWidth="120" text="Date" />
+                    <TableColumn fx:id="adresse" prefWidth="246.0" text="Adresse" />
+                    <TableColumn fx:id="description" prefWidth="305.0" text="Déscription" />
+                    <TableColumn fx:id="statut" prefWidth="168.0" text="Statut" />
                 </columns>
             </TableView>
         </VBox>

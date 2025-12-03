@@ -18,16 +18,13 @@ public class DashAdminController {
     @FXML private Label signalementsLabel, collectesLabel, usersLabel, recyclingLabel;
 
     @FXML private AnchorPane dashboardView, usersView, settingsView;
-    @FXML private TableView<?> recentSignalementsTable, usersTable;
+    @FXML private TableView<?> recentSignalementsTable;
 
     // Boutons de navigation
     @FXML private Button dashboard, signalementsBtn, usersBtn, reportsBtn, settingsBtn;
 
     // Paramètres
-    @FXML private TextField appNameField, sessionDurationField, searchField;
-    @FXML private CheckBox notificationsCheck, uppercaseCheck, numbersCheck, lengthCheck;
-    @FXML private ComboBox<String> languageCombo, roleFilter, statusFilter;
-    @FXML private Button addUserBtn, filterBtn, saveSettingsBtn;
+    @FXML private ComboBox<String> languageCombo;
 
     @FXML
     public void initialize() {
@@ -69,24 +66,6 @@ public class DashAdminController {
 
         // Mettre à jour le style des boutons
         updateActiveButton(dashboard);
-    }
-
-    @FXML
-    private void showUsersView() {
-        if (dashboardView != null) dashboardView.setVisible(false);
-        if (usersView != null) usersView.setVisible(true);
-        if (settingsView != null) settingsView.setVisible(false);
-
-        updateActiveButton(usersBtn);
-    }
-
-    @FXML
-    private void showSettingsView() {
-        if (dashboardView != null) dashboardView.setVisible(false);
-        if (usersView != null) usersView.setVisible(false);
-        if (settingsView != null) settingsView.setVisible(true);
-
-        updateActiveButton(settingsBtn);
     }
 
     private void updateActiveButton(Button activeButton) {
@@ -192,7 +171,7 @@ public class DashAdminController {
 
     @FXML
     private void showUsers() {
-        showUsersView(); // Utiliser la vue interne au lieu de charger une nouvelle page
+        chargerPage("/com/example/gestiondechets/gestUsers.fxml");
     }
 
     @FXML
@@ -202,6 +181,6 @@ public class DashAdminController {
 
     @FXML
     private void showSettings() {
-        showSettingsView(); // Utiliser la vue interne au lieu de charger une nouvelle page
+        chargerPage("/com/example/gestiondechets/settings.fxml");
     }
 }

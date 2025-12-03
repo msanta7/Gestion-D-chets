@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.addInterventionController">
+
+    <!-- En-tête -->
+    <AnchorPane prefHeight="60.0" style="-fx-background-color: #006666;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Nouvelle Intervention" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="15.0" />
+    </AnchorPane>
+
+    <!-- Formulaire -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
+        <AnchorPane>
+
+            <!-- ID Signalement (clé étrangère REQUISE) -->
+            <Label style="-fx-font-weight: bold;" text="ID Signalement *" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
+            <TextField fx:id="idSignalementField" promptText="Ex: 1, 2, 3..." AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="310.0" AnchorPane.topAnchor="45.0" />
+
+            <!-- Bouton pour rechercher le signalement -->
+            <Button fx:id="rechercherSignalementBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 12px;" text="Rechercher Signalement" AnchorPane.leftAnchor="310.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="45.0" />
+
+            <!-- Informations du Signalement (affichage seulement) -->
+            <Label style="-fx-font-weight: bold;" text="Signalement Sélectionné:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="90.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d;" text="Adresse:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="120.0" />
+            <Label fx:id="adresseLabel" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="120.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d;" text="Description:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="145.0" />
+            <Label fx:id="descriptionLabel" style="-fx-font-weight: bold;" wrapText="true" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="145.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d;" text="État:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="170.0" />
+            <Label fx:id="etatLabel" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="170.0" />
+
+            <!-- Date Planification (DATETIME - REQUIS) -->
+            <Label style="-fx-font-weight: bold;" text="Date Planifiée *" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="210.0" />
+            <DatePicker fx:id="datePlanificationPicker" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="310.0" AnchorPane.topAnchor="235.0" />
+
+            <!-- Heure Planification -->
+            <Label style="-fx-font-weight: bold;" text="Heure Planifiée *" AnchorPane.leftAnchor="310.0" AnchorPane.topAnchor="210.0" />
+            <ComboBox fx:id="heurePlanificationCombo" AnchorPane.leftAnchor="310.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="235.0" />
+
+            <!-- Statut (ENUM avec valeur par défaut 'planifiee') -->
+            <Label style="-fx-font-weight: bold;" text="Statut" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="280.0" />
+            <ComboBox fx:id="statutCombo" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="310.0" AnchorPane.topAnchor="305.0" />
+
+            <!-- Notes (TEXT - optionnel) -->
+            <Label style="-fx-font-weight: bold;" text="Notes" AnchorPane.leftAnchor="310.0" AnchorPane.topAnchor="280.0" />
+            <TextArea fx:id="notesArea" promptText="Notes additionnelles sur l'intervention..." AnchorPane.leftAnchor="310.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="305.0" AnchorPane.bottomAnchor="20.0" />
+
+            <!-- Message d'erreur/succès -->
+            <Label fx:id="messageLabel" style="-fx-font-size: 14px;" wrapText="true" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="270.0" />
+
+        </AnchorPane>
+    </ScrollPane>
+
+    <!-- Boutons en bas -->
+    <AnchorPane prefHeight="70.0" style="-fx-background-color: #ecf0f1;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <Button fx:id="annulerBtn" mnemonicParsing="false" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold;" text="Annuler" AnchorPane.rightAnchor="140.0" AnchorPane.topAnchor="20.0" />
+        <Button fx:id="validerBtn" mnemonicParsing="false" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;" text="Valider" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
+    </AnchorPane>
+
+</AnchorPane>

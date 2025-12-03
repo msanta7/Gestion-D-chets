@@ -136,13 +136,11 @@
             <TableView fx:id="usersTable" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="60">
                 <columns>
                     <TableColumn prefWidth="50" text="ID" />
-                    <TableColumn prefWidth="150" text="Nom complet" />
-                    <TableColumn prefWidth="150" text="Email" />
-                    <TableColumn prefWidth="120" text="Téléphone" />
-                    <TableColumn prefWidth="100" text="Rôle" />
-                    <TableColumn prefWidth="100" text="Date création" />
-                    <TableColumn prefWidth="80" text="Statut" />
-                    <TableColumn prefWidth="150" text="Actions" />
+                    <TableColumn prefWidth="167.0" text="Nom complet" />
+                    <TableColumn prefWidth="167.0" text="Téléphone" />
+                    <TableColumn prefWidth="133.0" text="Rôle" />
+                    <TableColumn prefWidth="153.0" text="Date création" />
+                    <TableColumn prefWidth="179.0" text="Actions" />
                 </columns>
             </TableView>
 

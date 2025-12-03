@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.EffectuerCollecteController">
+
+    <!-- Menu latéral -->
+    <AnchorPane prefWidth="220.0" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- En-tête profil -->
+        <Circle fill="white" radius="40.0" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="40.0" />
+        <Label style="-fx-font-size: 32px;" text="🚛" AnchorPane.leftAnchor="90.0" AnchorPane.topAnchor="60.0" />
+
+        <Label fx:id="nomAgentCollecteurLabel" prefHeight="30.0" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-alignment: CENTER;" text="Agent Collecteur" wrapText="true" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="130.0" />
+
+        <Separator prefWidth="180.0" style="-fx-background-color: rgba(255,255,255,0.3);" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="170.0" />
+
+        <!-- Menu navigation -->
+        <Button onAction="#retourDashboard" prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px;" text="← Retour" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="190.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <Button onAction="#effectuerNouvelleCollecte" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="+ Nouvelle Collecte" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="240.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <Button fx:id="historiqueBtn" onAction="#showHistorique" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Historique" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="290.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <!-- Déconnexion -->
+        <Button onAction="#handleLogout" prefHeight="35.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-radius: 5; -fx-border-color: white;" text="Déconnexion" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+
+    </AnchorPane>
+
+    <!-- Contenu principal -->
+    <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- Header -->
+        <Label style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Effectuer une Collecte" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
+
+        <!-- Formulaire de Collecte -->
+        <AnchorPane layoutY="93.0" prefHeight="577.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="93.0">
+
+            <!-- Titre du formulaire -->
+            <Label style="-fx-text-fill: #006666; -fx-font-size: 20px; -fx-font-weight: bold;" text="Nouvelle Collecte" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
+
+            <!-- ID Intervention (clé étrangère REQUISE) -->
+            <Label style="-fx-font-weight: bold;" text="ID Intervention *" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="70.0" />
+            <TextField fx:id="idInterventionField" promptText="Ex: 1, 2, 3..." AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="310.0" AnchorPane.topAnchor="95.0" />
+
+            <!-- Bouton pour rechercher l'intervention -->
+            <Button fx:id="rechercherInterventionBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 12px;" text="Rechercher Intervention" AnchorPane.leftAnchor="310.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="95.0" />
+
+            <!-- Informations de l'Intervention (affichage seulement) -->
+            <Label style="-fx-font-weight: bold;" text="Intervention Sélectionnée:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="140.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d;" text="Adresse:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="170.0" />
+            <Label fx:id="adresseInterventionLabel" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="170.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d;" text="Date Planifiée:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="195.0" />
+            <Label fx:id="dateInterventionLabel" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="195.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d;" text="Statut:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="220.0" />
+            <Label fx:id="statutInterventionLabel" style="-fx-font-weight: bold;" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="220.0" />
+
+            <!-- Quantité Collectée (DECIMAL REQUIS) -->
+            <Label style="-fx-font-weight: bold;" text="Quantité Collectée (kg) *" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="260.0" />
+            <TextField fx:id="quantiteCollecteeField" promptText="Ex: 150.5" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="310.0" AnchorPane.topAnchor="285.0" />
+
+            <!-- Spinner pour la quantité -->
+            <Spinner fx:id="quantiteSpinner" AnchorPane.leftAnchor="310.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="285.0" />
+
+            <!-- Date de Collecte (DATETIME avec valeur par défaut) -->
+            <Label style="-fx-font-weight: bold;" text="Date de Collecte" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="330.0" />
+            <DatePicker fx:id="dateCollectePicker" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="310.0" AnchorPane.topAnchor="355.0" />
+
+            <!-- Boutons -->
+            <Button fx:id="validerCollecteBtn" layoutX="635.0" layoutY="462.0" mnemonicParsing="false" onAction="#validerCollecte" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;" text="Valider Collecte" AnchorPane.bottomAnchor="80.0" AnchorPane.rightAnchor="165.0" />
+
+            <Button fx:id="annulerCollecteBtn" layoutX="774.0" layoutY="462.0" mnemonicParsing="false" onAction="#annulerCollecte" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold;" text="Annuler" AnchorPane.bottomAnchor="80.0" AnchorPane.rightAnchor="26.0" />
+
+            <!-- Message d'erreur/succès -->
+            <Label fx:id="messageLabel" style="-fx-font-size: 14px;" wrapText="true" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+
+        </AnchorPane>
+
+    </AnchorPane>
+
+</AnchorPane>

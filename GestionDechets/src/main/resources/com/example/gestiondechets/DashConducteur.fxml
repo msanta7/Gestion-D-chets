@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.DashConducteurController">
+
+    <!-- Menu latéral -->
+    <AnchorPane prefWidth="220.0" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- En-tête profil -->
+        <Circle fill="white" radius="40.0" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="40.0" />
+        <Label style="-fx-font-size: 32px;" text="🚚" AnchorPane.leftAnchor="90.0" AnchorPane.topAnchor="60.0" />
+
+        <Label fx:id="nomConducteurLabel" prefHeight="30.0" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-alignment: CENTER;" text="Conducteur" wrapText="true" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="130.0" />
+
+        <Separator prefWidth="180.0" style="-fx-background-color: rgba(255,255,255,0.3);" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="170.0" />
+
+        <!-- Menu navigation -->
+        <Button fx:id="dashboardBtn" onAction="#showDashboard" prefHeight="40.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px;" text="Tableau de bord" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="190.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <Button fx:id="collecteBtn" onAction="#showCollecte" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Effectuer collecte" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="240.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <Button fx:id="signalementsBtn" onAction="#showSignalements" prefHeight="40.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;" text="Signalements assignés" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="290.0">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Button>
+
+        <!-- Déconnexion -->
+        <Button onAction="#handleLogout" prefHeight="35.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-radius: 5; -fx-border-color: white;" text="Déconnexion" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+
+    </AnchorPane>
+
+    <!-- Contenu principal -->
+    <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- Header avec bouton Ajouter -->
+        <Label style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Tableau de Bord - Conducteur" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
+
+        <Button onAction="#ouvrirPopupAjoutIntervention" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" text="+ Ajouter Intervention" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+            <padding>
+                <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
+            </padding>
+        </Button>
+
+        <!-- Cartes statistiques -->
+
+        <!-- Carte Interventions Planifiées -->
+        <AnchorPane prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="100.0">
+            <AnchorPane prefHeight="5.0" style="-fx-background-color: #3498db; -fx-background-radius: 10 10 0 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Interventions Planifiées" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0" />
+            <Label fx:id="interventionsPlanifieesLabel" style="-fx-text-fill: #2c3e50; -fx-font-size: 36px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Pour aujourd'hui" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
+        </AnchorPane>
+
+        <!-- Carte Collectes Effectuées -->
+        <AnchorPane prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="310.0" AnchorPane.topAnchor="100.0">
+            <AnchorPane prefHeight="5.0" style="-fx-background-color: #f39c12; -fx-background-radius: 10 10 0 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Collectes Effectuées" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0" />
+            <Label fx:id="collectesEffectueesLabel" style="-fx-text-fill: #2c3e50; -fx-font-size: 36px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Ce mois" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="20.0" />
+            <Label style="-fx-text-fill: #2ecc71; -fx-font-size: 12px;" text="▲" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="10.0" />
+        </AnchorPane>
+
+        <!-- Carte Signalements En Attente -->
+        <AnchorPane prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="590.0" AnchorPane.topAnchor="100.0">
+            <AnchorPane prefHeight="5.0" style="-fx-background-color: #2ecc71; -fx-background-radius: 10 10 0 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px;" text="Signalements Assignés" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0" />
+            <Label fx:id="signalementsAssignesLabel" style="-fx-text-fill: #2c3e50; -fx-font-size: 36px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0" />
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="À traiter" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
+        </AnchorPane>
+
+        <!-- Section Interventions -->
+        <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Liste des Interventions" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="280.0" />
+
+        <!-- Tableau des interventions -->
+        <TableView fx:id="interventionsTable" style="-fx-background-color: white; -fx-background-radius: 10;" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="310.0">
+            <columns>
+                <TableColumn fx:id="idIntervention" prefWidth="80" text="ID" />
+                <TableColumn fx:id="datePlanification" prefWidth="180.0" text="Date Planifiée" />
+                <TableColumn fx:id="adresseSignalement" prefWidth="250.0" text="Adresse" />
+                <TableColumn fx:id="dateRealisation" prefWidth="180.0" text="Date de Réalisation" />
+                <TableColumn fx:id="statu" prefWidth="120.0" text="Statut" />
+                <TableColumn fx:id="actionsColumn" prefWidth="150.0" text="Actions" /> <!-- AJOUT DU fx:id ICI -->
+            </columns>
+        </TableView>
+
+    </AnchorPane>
+
+</AnchorPane>

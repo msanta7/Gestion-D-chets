@@ -4,7 +4,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,14 +32,39 @@ public class GestUsers {
         }
 
         @FXML
-        private void showCollectes() {
-            // Naviguer vers collectes
-        }
-
-
-        @FXML
         private void openAddUserDialog() {
-            // Code pour ajouter utilisateur
+                try {
+                        // Charger le FXML
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/gestiondechets/addUser.fxml"));
+                        Parent root = loader.load();
+
+                        // Créer la fenêtre popup
+                        Stage popupStage = new Stage();
+                        popupStage.initModality(Modality.APPLICATION_MODAL);
+                        popupStage.initOwner(userNameLabel.getScene().getWindow());
+                        popupStage.initStyle(StageStyle.UTILITY);
+
+                        // Configurer le contrôleur
+                        AddUserController controller = loader.getController();
+                        controller.setStage(popupStage);
+
+                        // Afficher la fenêtre
+                        Scene scene = new Scene(root);
+                        popupStage.setScene(scene);
+                        popupStage.setTitle("Ajouter un utilisateur");
+                        popupStage.setResizable(false);
+                        popupStage.showAndWait();
+
+                        // Rafraîchir les données après fermeture
+                        // Vous pouvez appeler une méthode pour actualiser le tableau ici
+
+                } catch (IOException e) {
+                        e.printStackTrace();
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Erreur");
+                        alert.setContentText("Impossible d'ouvrir le formulaire d'ajout.");
+                        alert.showAndWait();
+                }
         }
 
         @FXML

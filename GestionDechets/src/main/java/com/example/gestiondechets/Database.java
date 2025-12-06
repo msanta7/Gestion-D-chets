@@ -11,7 +11,7 @@ public class Database {
     {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connect= DriverManager.getConnection("jdbc:mysql://localhost:3306/project_db","root","45689001h");
+            Connection connect= DriverManager.getConnection("jdbc:mysql://localhost:3306/gestion_dechets","root","45689001h");
 
             if (connect != null) {
                 System.out.println("Connected to the database successfully");

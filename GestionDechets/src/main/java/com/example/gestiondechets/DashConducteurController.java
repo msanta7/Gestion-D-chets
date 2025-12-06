@@ -3,7 +3,6 @@ package com.example.gestiondechets;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -14,76 +13,109 @@ import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class DashConducteurController implements Initializable {
 
     @FXML
     private Label nomConducteurLabel;
-
     @FXML
     private Label interventionsPlanifieesLabel;
-
     @FXML
     private Label collectesEffectueesLabel;
-
     @FXML
     private Label signalementsAssignesLabel;
-
     @FXML
     private TableView<Intervention> interventionsTable;
-
     @FXML
     private TableColumn<Intervention, Integer> idIntervention;
-
     @FXML
     private TableColumn<Intervention, String> datePlanification;
-
     @FXML
     private TableColumn<Intervention, String> adresseSignalement;
-
     @FXML
     private TableColumn<Intervention, String> dateRealisation;
-
     @FXML
     private TableColumn<Intervention, String> statu;
-
     @FXML
     private TableColumn<Intervention, Void> actionsColumn;
-
     @FXML
     private Button dashboardBtn;
-
     @FXML
     private Button collecteBtn;
-
     @FXML
     private Button signalementsBtn;
 
     private ObservableList<Intervention> interventionsList;
-    private int idConducteurConnecte = 1; // ID du conducteur connecté
+    private int idConducteurConnecte = 0; // Initialiser à 0
+    private String nomConducteur = "";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialiser les labels
-        nomConducteurLabel.setText("Mohamed Ali (Conducteur)");
+        // Récupérer l'ID du conducteur connecté
+        loadConducteurInfo();
 
         // Initialiser la table
         setupTableView();
 
-        // Charger les données de test
-        loadSampleData();
+        // Charger les données depuis la base de données
+        loadDataFromDatabase();
 
         // Mettre à jour les statistiques
         updateStatistics();
 
         // Configurer les actions des boutons
         setupButtonActions();
+    }
+
+    private void loadConducteurInfo() {
+        try {
+            Connection conn = Database.connectDB();
+            if (conn != null) {
+                // Récupérer le premier conducteur disponible
+                String query = "SELECT id_utilisateur, nom FROM UTILISATEUR WHERE role = 'conducteur' LIMIT 1";
+                PreparedStatement pst = conn.prepareStatement(query);
+                ResultSet rs = pst.executeQuery();
+
+                if (rs.next()) {
+                    idConducteurConnecte = rs.getInt("id_utilisateur");
+                    nomConducteur = rs.getString("nom");
+                    nomConducteurLabel.setText(nomConducteur + " (Conducteur)");
+                } else {
+                    // Si aucun conducteur n'existe, insérer-en un
+                    String insertQuery = """
+                        INSERT INTO UTILISATEUR (nom, telephone, adresse, role, mot_de_passe) 
+                        VALUES ('Conducteur Test', '0612345678', 'Adresse Test', 'conducteur', 'password123')
+                    """;
+                    PreparedStatement insertStmt = conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+                    insertStmt.executeUpdate();
+
+                    ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        idConducteurConnecte = generatedKeys.getInt(1);
+                        nomConducteur = "Conducteur Test";
+                        nomConducteurLabel.setText(nomConducteur + " (Conducteur)");
+                    }
+                }
+
+                conn.close();
+
+                if (idConducteurConnecte == 0) {
+                    showAlert("Erreur", "Aucun conducteur trouvé dans la base de données", Alert.AlertType.ERROR);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger les informations du conducteur: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     private void setupTableView() {
@@ -107,24 +139,34 @@ public class DashConducteurController implements Initializable {
             private final Button modifierBtn = new Button("Modifier");
             private final Button terminerBtn = new Button("Terminer");
             private final Button annulerBtn = new Button("Annuler");
+            private final Button supprimerBtn = new Button("Supprimer");
 
             {
-                modifierBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 12px;");
+                // Style des boutons
+                modifierBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10;");
+                terminerBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10;");
+                annulerBtn.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10;");
+                supprimerBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10;");
+
+                // Actions des boutons
                 modifierBtn.setOnAction(event -> {
                     Intervention intervention = getTableView().getItems().get(getIndex());
                     modifierIntervention(intervention);
                 });
 
-                terminerBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 12px;");
                 terminerBtn.setOnAction(event -> {
                     Intervention intervention = getTableView().getItems().get(getIndex());
                     terminerIntervention(intervention);
                 });
 
-                annulerBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 12px;");
                 annulerBtn.setOnAction(event -> {
                     Intervention intervention = getTableView().getItems().get(getIndex());
                     annulerIntervention(intervention);
+                });
+
+                supprimerBtn.setOnAction(event -> {
+                    Intervention intervention = getTableView().getItems().get(getIndex());
+                    supprimerIntervention(intervention);
                 });
             }
 
@@ -139,12 +181,13 @@ public class DashConducteurController implements Initializable {
 
                     // Afficher les boutons selon le statut
                     String statut = intervention.getStatut();
+
                     if (statut.equals("planifiee") || statut.equals("en_cours")) {
                         buttonsContainer.getChildren().addAll(modifierBtn, terminerBtn, annulerBtn);
                     } else if (statut.equals("terminee")) {
-                        buttonsContainer.getChildren().add(modifierBtn);
-                    } else {
-                        buttonsContainer.getChildren().add(modifierBtn);
+                        buttonsContainer.getChildren().addAll(modifierBtn, supprimerBtn);
+                    } else if (statut.equals("annulee")) {
+                        buttonsContainer.getChildren().addAll(modifierBtn, supprimerBtn);
                     }
 
                     setGraphic(buttonsContainer);
@@ -153,54 +196,170 @@ public class DashConducteurController implements Initializable {
         });
     }
 
-    private void loadSampleData() {
-        // Ajouter des données de test compatibles avec la table INTERVENTION
-        Intervention i1 = new Intervention(1,
-                LocalDateTime.now().plusDays(1).withHour(9).withMinute(0),
-                "planifiee",
-                "Collecte des ordures ménagères");
-        i1.setIdIntervention(1);
-        i1.setIdConducteur(this.idConducteurConnecte);
-        i1.setAdresseSignalement("Rue Mohammed V, Casablanca");
-        interventionsList.add(i1);
+    private void loadDataFromDatabase() {
+        try {
+            Connection conn = Database.connectDB();
+            if (conn != null) {
+                // Vérifier que l'ID du conducteur est valide
+                if (idConducteurConnecte == 0) {
+                    showAlert("Erreur", "ID conducteur invalide", Alert.AlertType.ERROR);
+                    return;
+                }
 
-        Intervention i2 = new Intervention(2,
-                LocalDateTime.now().withHour(14).withMinute(0),
-                "terminee",
-                "Collecte des déchets recyclables");
-        i2.setIdIntervention(2);
-        i2.setIdConducteur(this.idConducteurConnecte);
-        i2.setDateRealisation(LocalDateTime.now());
-        i2.setAdresseSignalement("Avenue Hassan II, Rabat");
-        interventionsList.add(i2);
+                String query = """
+                    SELECT 
+                        i.id_intervention,
+                        i.date_planification,
+                        i.date_realisation,
+                        i.statut,
+                        i.notes,
+                        i.id_conducteur,
+                        i.id_signalement,
+                        s.adresse as adresse_signalement
+                    FROM INTERVENTION i
+                    INNER JOIN SIGNALEMENT s ON i.id_signalement = s.id_signalement
+                    WHERE i.id_conducteur = ?
+                    ORDER BY i.date_planification DESC
+                """;
 
-        Intervention i3 = new Intervention(3,
-                LocalDateTime.now().plusDays(2).withHour(10).withMinute(30),
-                "planifiee",
-                "Collecte d'objets encombrants");
-        i3.setIdIntervention(3);
-        i3.setIdConducteur(this.idConducteurConnecte);
-        i3.setAdresseSignalement("Quartier Industriel, Tanger");
-        interventionsList.add(i3);
+                PreparedStatement pst = conn.prepareStatement(query);
+                pst.setInt(1, idConducteurConnecte);
+                ResultSet rs = pst.executeQuery();
 
-        // Mettre à jour les statistiques
-        updateStatistics();
+                interventionsList.clear();
+
+                while (rs.next()) {
+                    Intervention intervention = new Intervention();
+                    intervention.setIdIntervention(rs.getInt("id_intervention"));
+
+                    // Date de planification
+                    java.sql.Timestamp planifTimestamp = rs.getTimestamp("date_planification");
+                    if (planifTimestamp != null) {
+                        intervention.setDatePlanification(planifTimestamp.toLocalDateTime());
+                    }
+
+                    // Date de réalisation
+                    java.sql.Timestamp realTimestamp = rs.getTimestamp("date_realisation");
+                    if (realTimestamp != null) {
+                        intervention.setDateRealisation(realTimestamp.toLocalDateTime());
+                    }
+
+                    intervention.setStatut(rs.getString("statut"));
+                    intervention.setNotes(rs.getString("notes"));
+                    intervention.setIdConducteur(rs.getInt("id_conducteur"));
+                    intervention.setIdSignalement(rs.getInt("id_signalement"));
+                    intervention.setAdresseSignalement(rs.getString("adresse_signalement"));
+
+                    interventionsList.add(intervention);
+                }
+
+                conn.close();
+
+                if (interventionsList.isEmpty()) {
+                    // Pas d'alerte, juste un message dans la console
+                    System.out.println("Aucune intervention trouvée pour ce conducteur.");
+                }
+
+            } else {
+                showAlert("Erreur", "Impossible de se connecter à la base de données", Alert.AlertType.ERROR);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur de base de données", "Erreur lors du chargement des interventions: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     private void updateStatistics() {
+        try {
+            Connection conn = Database.connectDB();
+            if (conn != null) {
+                // Vérifier que l'ID du conducteur est valide
+                if (idConducteurConnecte == 0) {
+                    calculateLocalStatistics();
+                    return;
+                }
+
+                LocalDate aujourdhui = LocalDate.now();
+                String aujourdhuiStr = aujourdhui.toString();
+
+                // 1. Interventions planifiées pour aujourd'hui
+                String queryPlanifiees = """
+                    SELECT COUNT(*) as count 
+                    FROM INTERVENTION 
+                    WHERE id_conducteur = ? 
+                    AND statut IN ('planifiee', 'en_cours')
+                    AND DATE(date_planification) = ?
+                """;
+
+                PreparedStatement pst1 = conn.prepareStatement(queryPlanifiees);
+                pst1.setInt(1, idConducteurConnecte);
+                pst1.setString(2, aujourdhuiStr);
+                ResultSet rs1 = pst1.executeQuery();
+                if (rs1.next()) {
+                    interventionsPlanifieesLabel.setText(String.valueOf(rs1.getInt("count")));
+                }
+
+                // 2. Collectes effectuées ce mois (interventions terminées)
+                String queryCollectes = """
+                    SELECT COUNT(*) as count 
+                    FROM INTERVENTION 
+                    WHERE id_conducteur = ? 
+                    AND statut = 'terminee'
+                    AND MONTH(date_realisation) = MONTH(CURRENT_DATE())
+                    AND YEAR(date_realisation) = YEAR(CURRENT_DATE())
+                """;
+
+                PreparedStatement pst2 = conn.prepareStatement(queryCollectes);
+                pst2.setInt(1, idConducteurConnecte);
+                ResultSet rs2 = pst2.executeQuery();
+                if (rs2.next()) {
+                    collectesEffectueesLabel.setText(String.valueOf(rs2.getInt("count")));
+                }
+
+                // 3. Signalements à traiter
+                String queryATraiter = """
+                    SELECT COUNT(*) as count 
+                    FROM INTERVENTION 
+                    WHERE id_conducteur = ? 
+                    AND statut IN ('planifiee', 'en_cours')
+                """;
+
+                PreparedStatement pst3 = conn.prepareStatement(queryATraiter);
+                pst3.setInt(1, idConducteurConnecte);
+                ResultSet rs3 = pst3.executeQuery();
+                if (rs3.next()) {
+                    signalementsAssignesLabel.setText(String.valueOf(rs3.getInt("count")));
+                }
+
+                conn.close();
+
+            } else {
+                calculateLocalStatistics();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            calculateLocalStatistics();
+        }
+    }
+
+    private void calculateLocalStatistics() {
         LocalDate aujourdhui = LocalDate.now();
 
         // Interventions planifiées pour aujourd'hui
         int interventionsAujourdhui = (int) interventionsList.stream()
                 .filter(i -> i.getDatePlanification() != null
-                        && i.getDatePlanification().toLocalDate().isEqual(aujourdhui))
+                        && i.getDatePlanification().toLocalDate().isEqual(aujourdhui)
+                        && (i.getStatut().equals("planifiee") || i.getStatut().equals("en_cours")))
                 .count();
 
         // Collectes effectuées (statut 'terminee') ce mois
         int collectesCeMois = (int) interventionsList.stream()
                 .filter(i -> i.getStatut().equals("terminee")
                         && i.getDateRealisation() != null
-                        && i.getDateRealisation().getMonth() == aujourdhui.getMonth())
+                        && i.getDateRealisation().getMonth() == aujourdhui.getMonth()
+                        && i.getDateRealisation().getYear() == aujourdhui.getYear())
                 .count();
 
         // Signalements à traiter (statut 'planifiee' ou 'en_cours')
@@ -222,23 +381,20 @@ public class DashConducteurController implements Initializable {
 
     @FXML
     private void showDashboard() {
-        // Logique pour afficher le dashboard
-        System.out.println("Dashboard clicked");
-        // Vous pouvez mettre à jour le contenu principal ici si nécessaire
+        // Recharger les données depuis la base
+        loadDataFromDatabase();
+        updateStatistics();
     }
 
     @FXML
     private void showCollecte() {
         try {
-            // Charger le nouveau fichier FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("historique-collecte.fxml"));
             Parent root = loader.load();
 
-            // Obtenir la scène actuelle
             Stage stage = (Stage) collecteBtn.getScene().getWindow();
             Scene scene = new Scene(root);
 
-            // Changer la scène
             stage.setScene(scene);
             stage.show();
 
@@ -267,7 +423,6 @@ public class DashConducteurController implements Initializable {
     @FXML
     public void handleLogout() {
         try {
-            // Demander confirmation avant de déconnecter
             Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
             confirmation.setTitle("Confirmation de déconnexion");
             confirmation.setHeaderText("Déconnexion");
@@ -276,14 +431,10 @@ public class DashConducteurController implements Initializable {
             confirmation.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     try {
-                        // Charger la vue de connexion
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
                         Parent root = loader.load();
 
-                        // Récupérer la scène actuelle
                         Stage stage = (Stage) nomConducteurLabel.getScene().getWindow();
-
-                        // Changer de scène
                         stage.setScene(new Scene(root));
                         stage.setTitle("Connexion - Gestion des Déchets");
                         stage.centerOnScreen();
@@ -304,291 +455,223 @@ public class DashConducteurController implements Initializable {
     @FXML
     public void ouvrirPopupAjoutIntervention() {
         try {
-            System.out.println("Tentative d'ouverture du formulaire d'ajout d'intervention...");
-
-            // Vérifier si le fichier FXML existe
-            URL fxmlUrl = getClass().getResource("addIntervention.fxml");
-            if (fxmlUrl == null) {
-                System.err.println("ERREUR: Fichier addIntervention.fxml introuvable dans le classpath!");
-
-                // Essayer un chemin absolu
-                fxmlUrl = getClass().getResource("/com/example/gestiondechets/addIntervention.fxml");
-                if (fxmlUrl == null) {
-                    throw new IOException("Fichier addIntervention.fxml introuvable dans le classpath.");
-                }
+            // Vérifier que l'ID du conducteur est valide
+            if (idConducteurConnecte == 0) {
+                showAlert("Erreur", "Conducteur non identifié", Alert.AlertType.ERROR);
+                return;
             }
 
-            System.out.println("Fichier FXML trouvé: " + fxmlUrl);
-
-            // Charger le fichier FXML de la popup
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            // Charger le formulaire d'ajout d'intervention
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("addIntervention.fxml"));
             Parent root = loader.load();
-            System.out.println("FXML chargé avec succès");
 
-            // Récupérer le contrôleur de la popup
             addInterventionController controller = loader.getController();
-
-            if (controller == null) {
-                throw new IllegalStateException("Le contrôleur addInterventionController n'a pas été instancié.");
-            }
-
-            System.out.println("Contrôleur récupéré: " + controller.getClass().getName());
-
-            // Passer les références au contrôleur
             controller.setIdConducteurConnecte(this.idConducteurConnecte);
             controller.setMainController(this);
 
-            System.out.println("Paramètres passés au contrôleur: idConducteur=" + this.idConducteurConnecte);
-
-            // Récupérer la fenêtre principale - version sans multiple assignations
-            Stage primaryStage = null;
-            try {
-                if (nomConducteurLabel != null && nomConducteurLabel.getScene() != null) {
-                    primaryStage = (Stage) nomConducteurLabel.getScene().getWindow();
-                    System.out.println("Fenêtre principale récupérée: " + primaryStage);
-                } else {
-                    System.err.println("Warning: Impossible de récupérer la fenêtre principale");
-                }
-            } catch (Exception e) {
-                System.err.println("Warning: Erreur lors de la récupération de la fenêtre principale: " + e.getMessage());
-                // Ne pas réassigner primaryStage ici
-            }
-
-            // Créer une nouvelle scène
             Scene scene = new Scene(root);
             Stage popupStage = new Stage();
             popupStage.setTitle("Ajouter une Intervention");
             popupStage.initModality(Modality.APPLICATION_MODAL);
 
-            // Lier à la fenêtre principale si disponible
-            if (primaryStage != null) {
-                popupStage.initOwner(primaryStage);
-            }
-
-            popupStage.setScene(scene);
-
-            // Passer la référence du stage au contrôleur
-            controller.setPopupStage(popupStage);
-
-            // Configuration de la fenêtre popup
-            popupStage.setResizable(false);
-
-            // Centrer la fenêtre popup - utiliser des variables finales locales
-            final Stage finalPrimaryStage = primaryStage; // Créer une copie finale
-            final Stage finalPopupStage = popupStage; // Créer une copie finale
-
-            popupStage.setOnShown(event -> {
-                if (finalPrimaryStage != null) {
-                    // Centrer par rapport à la fenêtre principale
-                    finalPopupStage.setX(finalPrimaryStage.getX() + (finalPrimaryStage.getWidth() - finalPopupStage.getWidth()) / 2);
-                    finalPopupStage.setY(finalPrimaryStage.getY() + (finalPrimaryStage.getHeight() - finalPopupStage.getHeight()) / 2);
-                } else {
-                    // Centrer sur l'écran
-                    finalPopupStage.centerOnScreen();
-                }
-            });
-
-            // Afficher la popup et attendre sa fermeture
-            System.out.println("Affichage de la popup d'ajout d'intervention...");
-            popupStage.showAndWait();
-
-            System.out.println("Popup d'ajout d'intervention fermée");
-
-        } catch (IOException e) {
-            // Erreur de fichier FXML
-            e.printStackTrace();
-            System.err.println("ERREUR CRITIQUE: Impossible de charger le fichier FXML!");
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur Fichier Manquant");
-            alert.setHeaderText("Fichier addIntervention.fxml introuvable");
-            alert.setContentText("Le fichier de formulaire est introuvable.\n\n" +
-                    "Assurez-vous que le fichier 'addIntervention.fxml' existe dans:\n" +
-                    "• src/main/resources/com/example/gestiondechets/\n" +
-                    "• Ou dans le même package que DashConducteurController\n\n" +
-                    "Erreur technique: " + e.getMessage());
-            alert.getDialogPane().setPrefSize(500, 250);
-            alert.showAndWait();
-
-        } catch (IllegalStateException e) {
-            // Erreur de contrôleur
-            e.printStackTrace();
-            System.err.println("ERREUR: Problème avec le contrôleur FXML!");
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur Contrôleur");
-            alert.setHeaderText("Erreur lors du chargement du formulaire");
-            alert.setContentText("Impossible de charger le contrôleur du formulaire.\n\n" +
-                    "Vérifiez que:\n" +
-                    "1. Le fichier addIntervention.fxml a un fx:controller valide\n" +
-                    "2. La classe addInterventionController existe\n" +
-                    "3. Toutes les méthodes nécessaires sont implémentées\n\n" +
-                    "Erreur: " + e.getMessage());
-            alert.showAndWait();
-
-        } catch (Exception e) {
-            // Erreur générale
-            e.printStackTrace();
-            System.err.println("ERREUR INATTENDUE: " + e.getClass().getName() + " - " + e.getMessage());
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur Inattendue");
-            alert.setHeaderText("Une erreur inattendue s'est produite");
-            alert.setContentText("Impossible d'ouvrir le formulaire d'ajout.\n\n" +
-                    "Détails techniques: " + e.getClass().getSimpleName() + "\n" +
-                    "Message: " + e.getMessage() + "\n\n" +
-                    "Veuillez redémarrer l'application.");
-            alert.showAndWait();
-        }
-    }
-
-
-    public void ajouterNouvelleIntervention(Intervention intervention) {
-        try {
-            System.out.println("Tentative d'ajout d'une nouvelle intervention...");
-
-            // Validation de base
-            if (intervention == null) {
-                throw new IllegalArgumentException("L'intervention ne peut pas être null");
-            }
-
-            System.out.println("Intervention reçue: ID Signalement=" + intervention.getIdSignalement() +
-                    ", Date=" + intervention.getDatePlanification() +
-                    ", Statut=" + intervention.getStatut());
-
-            // S'assurer que l'ID du conducteur est défini
-            if (intervention.getIdConducteur() == 0) {
-                intervention.setIdConducteur(this.idConducteurConnecte);
-                System.out.println("ID Conducteur défini: " + this.idConducteurConnecte);
-            }
-
-            // Générer un ID temporaire
-            int nouvelId;
-            if (interventionsList.isEmpty()) {
-                nouvelId = 1000;
-            } else {
-                nouvelId = interventionsList.stream()
-                        .mapToInt(Intervention::getIdIntervention)
-                        .max()
-                        .orElse(999) + 1;
-            }
-
-            intervention.setIdIntervention(nouvelId);
-            System.out.println("ID attribué à l'intervention: " + nouvelId);
-
-            // Ajouter à la liste
-            interventionsList.add(intervention);
-            System.out.println("Intervention ajoutée à la liste, taille actuelle: " + interventionsList.size());
-
-            // Rafraîchir la table
-            interventionsTable.refresh();
-            System.out.println("TableView rafraîchie");
-
-            // Mettre à jour les statistiques
-            updateStatistics();
-            System.out.println("Statistiques mises à jour");
-
-            // Afficher confirmation
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-            successAlert.setTitle("Succès");
-            successAlert.setHeaderText(null);
-            successAlert.setContentText("✅ Intervention ajoutée avec succès!\n\n" +
-                    "ID: " + intervention.getIdIntervention() + "\n" +
-                    "Signalement: " + intervention.getIdSignalement() + "\n" +
-                    "Date: " + intervention.getDatePlanificationFormatted() + "\n" +
-                    "Statut: " + intervention.getStatutFormatted());
-            successAlert.showAndWait();
-
-            System.out.println("Nouvelle intervention ajoutée avec succès: " + intervention);
-
-        } catch (IllegalArgumentException e) {
-            System.err.println("Erreur de validation: " + e.getMessage());
-
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setTitle("Erreur de Validation");
-            errorAlert.setHeaderText("Données invalides");
-            errorAlert.setContentText("Impossible d'ajouter l'intervention:\n\n" + e.getMessage());
-            errorAlert.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Erreur inattendue lors de l'ajout: " + e.getMessage());
-
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setTitle("Erreur");
-            errorAlert.setHeaderText("Erreur lors de l'ajout");
-            errorAlert.setContentText("Une erreur s'est produite lors de l'ajout de l'intervention:\n\n" + e.getMessage());
-            errorAlert.showAndWait();
-        }
-    }
-
-
-    // Méthode appelée par addInterventionController pour modifier une intervention existante
-    public void modifierInterventionExistante(Intervention interventionModifiee) {
-        try {
-            // Trouver l'intervention à modifier dans la liste
-            for (int i = 0; i < interventionsList.size(); i++) {
-                if (interventionsList.get(i).getIdIntervention() == interventionModifiee.getIdIntervention()) {
-                    // Mettre à jour l'intervention
-                    interventionsList.set(i, interventionModifiee);
-
-                    // Rafraîchir la table
-                    interventionsTable.refresh();
-
-                    // Mettre à jour les statistiques
-                    updateStatistics();
-
-                    showAlert("Succès", "Intervention modifiée avec succès!", Alert.AlertType.INFORMATION);
-                    return;
-                }
-            }
-
-            showAlert("Erreur", "Intervention non trouvée", Alert.AlertType.ERROR);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Erreur", "Erreur lors de la modification de l'intervention", Alert.AlertType.ERROR);
-        }
-    }
-
-    private void modifierIntervention(Intervention intervention) {
-        // Créer une variable finale pour le lambda
-        final Intervention interventionToModify = intervention;
-
-        try {
-            // Ouvrir la popup de modification
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("addIntervention.fxml"));
-            Parent root = loader.load();
-
-            addInterventionController controller = loader.getController();
-
-            // Passer l'ID du conducteur connecté
-            controller.setIdConducteurConnecte(this.idConducteurConnecte);
-            controller.setMainController(this);
-
-            // Pré-remplir le formulaire avec l'intervention à modifier
-            controller.preRemplirFormulaire(interventionToModify);
-
-            Scene scene = new Scene(root);
-            Stage popupStage = new Stage();
-            popupStage.setTitle("Modifier Intervention #" + interventionToModify.getIdIntervention());
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-
-            // Lier à la fenêtre principale si disponible
             if (nomConducteurLabel != null && nomConducteurLabel.getScene() != null) {
                 Stage primaryStage = (Stage) nomConducteurLabel.getScene().getWindow();
                 popupStage.initOwner(primaryStage);
             }
 
             popupStage.setScene(scene);
-            popupStage.setResizable(false);
-
             controller.setPopupStage(popupStage);
+            popupStage.setResizable(false);
+            popupStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Fichier addIntervention.fxml introuvable", Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de l'ouverture du formulaire", Alert.AlertType.ERROR);
+        }
+    }
+
+    public void ajouterNouvelleIntervention(Intervention intervention) {
+        try {
+            // Vérifier que l'ID du conducteur est valide
+            if (idConducteurConnecte == 0) {
+                showAlert("Erreur", "Conducteur non identifié", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Vérifier que l'ID du signalement existe
+            if (!checkSignalementExists(intervention.getIdSignalement())) {
+                showAlert("Erreur", "Le signalement #" + intervention.getIdSignalement() + " n'existe pas", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // VÉRIFIER QUE LE SIGNALEMENT N'A PAS DÉJÀ UNE INTERVENTION
+            if (checkSignalementHasIntervention(intervention.getIdSignalement())) {
+                showAlert("Erreur", "Ce signalement a déjà une intervention associée", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Insérer dans la base de données
+            Connection conn = Database.connectDB();
+            if (conn != null) {
+                String query = """
+                INSERT INTO INTERVENTION (date_planification, statut, notes, id_conducteur, id_signalement)
+                VALUES (?, ?, ?, ?, ?)
+            """;
+
+                PreparedStatement pst = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                pst.setTimestamp(1, java.sql.Timestamp.valueOf(intervention.getDatePlanification()));
+                pst.setString(2, intervention.getStatut());
+                pst.setString(3, intervention.getNotes());
+                pst.setInt(4, intervention.getIdConducteur());
+                pst.setInt(5, intervention.getIdSignalement());
+
+                int rowsAffected = pst.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    // Récupérer l'ID généré
+                    ResultSet generatedKeys = pst.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        int newId = generatedKeys.getInt(1);
+                        intervention.setIdIntervention(newId);
+                    }
+
+                    // Ajouter à la liste locale
+                    interventionsList.add(intervention);
+                    interventionsTable.refresh();
+                    updateStatistics();
+
+                    showAlert("Succès", "Intervention ajoutée avec succès!", Alert.AlertType.INFORMATION);
+                }
+
+                conn.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de l'ajout dans la base de données: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    // Ajouter cette méthode dans DashConducteurController
+    private boolean checkSignalementHasIntervention(int idSignalement) {
+        try {
+            Connection conn = Database.connectDB();
+            String query = "SELECT COUNT(*) FROM INTERVENTION WHERE id_signalement = ?";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setInt(1, idSignalement);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                conn.close();
+                return true;
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean checkSignalementExists(int idSignalement) {
+        try {
+            Connection conn = Database.connectDB();
+            String query = "SELECT COUNT(*) FROM SIGNALEMENT WHERE id_signalement = ?";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setInt(1, idSignalement);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                conn.close();
+                return true;
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void modifierIntervention(Intervention intervention) {
+        try {
+            // Ouvrir la popup de modification
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("addIntervention.fxml"));
+            Parent root = loader.load();
+
+            addInterventionController controller = loader.getController();
+            controller.setIdConducteurConnecte(this.idConducteurConnecte);
+            controller.setMainController(this);
+            controller.preRemplirFormulaire(intervention);
+
+            Scene scene = new Scene(root);
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Modifier Intervention #" + intervention.getIdIntervention());
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+
+            if (nomConducteurLabel != null && nomConducteurLabel.getScene() != null) {
+                Stage primaryStage = (Stage) nomConducteurLabel.getScene().getWindow();
+                popupStage.initOwner(primaryStage);
+            }
+
+            popupStage.setScene(scene);
+            controller.setPopupStage(popupStage);
+            popupStage.setResizable(false);
             popupStage.showAndWait();
 
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Erreur", "Impossible d'ouvrir le formulaire de modification", Alert.AlertType.ERROR);
+        }
+    }
+
+    public void modifierInterventionExistante(Intervention interventionModifiee) {
+        try {
+            // Mettre à jour dans la base de données
+            Connection conn = Database.connectDB();
+            if (conn != null) {
+                String query = """
+                    UPDATE INTERVENTION 
+                    SET date_planification = ?, statut = ?, notes = ?, 
+                        date_realisation = ?, id_signalement = ?
+                    WHERE id_intervention = ?
+                """;
+
+                PreparedStatement pst = conn.prepareStatement(query);
+                pst.setTimestamp(1, java.sql.Timestamp.valueOf(interventionModifiee.getDatePlanification()));
+                pst.setString(2, interventionModifiee.getStatut());
+                pst.setString(3, interventionModifiee.getNotes());
+
+                if (interventionModifiee.getDateRealisation() != null) {
+                    pst.setTimestamp(4, java.sql.Timestamp.valueOf(interventionModifiee.getDateRealisation()));
+                } else {
+                    pst.setNull(4, java.sql.Types.TIMESTAMP);
+                }
+
+                pst.setInt(5, interventionModifiee.getIdSignalement());
+                pst.setInt(6, interventionModifiee.getIdIntervention());
+
+                int rowsAffected = pst.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    // Mettre à jour dans la liste locale
+                    for (int i = 0; i < interventionsList.size(); i++) {
+                        if (interventionsList.get(i).getIdIntervention() == interventionModifiee.getIdIntervention()) {
+                            interventionsList.set(i, interventionModifiee);
+                            break;
+                        }
+                    }
+
+                    interventionsTable.refresh();
+                    updateStatistics();
+                    showAlert("Succès", "Intervention modifiée avec succès!", Alert.AlertType.INFORMATION);
+                }
+
+                conn.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de la modification dans la base de données: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -600,11 +683,28 @@ public class DashConducteurController implements Initializable {
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                intervention.setStatut("terminee");
-                intervention.setDateRealisation(LocalDateTime.now());
-                interventionsTable.refresh();
-                updateStatistics();
-                showAlert("Succès", "Intervention marquée comme terminée", Alert.AlertType.INFORMATION);
+                try {
+                    // Mettre à jour dans la base de données
+                    Connection conn = Database.connectDB();
+                    if (conn != null) {
+                        String query = "UPDATE INTERVENTION SET statut = 'terminee', date_realisation = NOW() WHERE id_intervention = ?";
+                        PreparedStatement pst = conn.prepareStatement(query);
+                        pst.setInt(1, intervention.getIdIntervention());
+                        pst.executeUpdate();
+                        conn.close();
+                    }
+
+                    // Mettre à jour localement
+                    intervention.setStatut("terminee");
+                    intervention.setDateRealisation(LocalDateTime.now());
+                    interventionsTable.refresh();
+                    updateStatistics();
+                    showAlert("Succès", "Intervention marquée comme terminée", Alert.AlertType.INFORMATION);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showAlert("Erreur", "Erreur lors de la mise à jour dans la base de données", Alert.AlertType.ERROR);
+                }
             }
         });
     }
@@ -617,15 +717,31 @@ public class DashConducteurController implements Initializable {
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                intervention.setStatut("annulee");
-                interventionsTable.refresh();
-                updateStatistics();
-                showAlert("Succès", "Intervention annulée", Alert.AlertType.INFORMATION);
+                try {
+                    // Mettre à jour dans la base de données
+                    Connection conn = Database.connectDB();
+                    if (conn != null) {
+                        String query = "UPDATE INTERVENTION SET statut = 'annulee' WHERE id_intervention = ?";
+                        PreparedStatement pst = conn.prepareStatement(query);
+                        pst.setInt(1, intervention.getIdIntervention());
+                        pst.executeUpdate();
+                        conn.close();
+                    }
+
+                    // Mettre à jour localement
+                    intervention.setStatut("annulee");
+                    interventionsTable.refresh();
+                    updateStatistics();
+                    showAlert("Succès", "Intervention annulée", Alert.AlertType.INFORMATION);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showAlert("Erreur", "Erreur lors de la mise à jour dans la base de données", Alert.AlertType.ERROR);
+                }
             }
         });
     }
 
-    @FXML
     private void supprimerIntervention(Intervention intervention) {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirmation de suppression");
@@ -634,9 +750,42 @@ public class DashConducteurController implements Initializable {
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                interventionsList.remove(intervention);
-                updateStatistics();
-                showAlert("Succès", "Intervention supprimée avec succès", Alert.AlertType.INFORMATION);
+                try {
+                    // Vérifier s'il y a des collectes associées
+                    Connection conn = Database.connectDB();
+                    if (conn != null) {
+                        // Vérifier les collectes associées
+                        String checkQuery = "SELECT COUNT(*) FROM COLLECTE WHERE id_intervention = ?";
+                        PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+                        checkStmt.setInt(1, intervention.getIdIntervention());
+                        ResultSet rs = checkStmt.executeQuery();
+
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            showAlert("Impossible de supprimer",
+                                    "Cette intervention a des collectes associées. Supprimez d'abord les collectes.",
+                                    Alert.AlertType.ERROR);
+                            return;
+                        }
+
+                        // Supprimer l'intervention
+                        String deleteQuery = "DELETE FROM INTERVENTION WHERE id_intervention = ?";
+                        PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery);
+                        deleteStmt.setInt(1, intervention.getIdIntervention());
+
+                        int rowsAffected = deleteStmt.executeUpdate();
+
+                        if (rowsAffected > 0) {
+                            interventionsList.remove(intervention);
+                            updateStatistics();
+                            showAlert("Succès", "Intervention supprimée avec succès", Alert.AlertType.INFORMATION);
+                        }
+
+                        conn.close();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showAlert("Erreur", "Erreur lors de la suppression dans la base de données", Alert.AlertType.ERROR);
+                }
             }
         });
     }
@@ -650,10 +799,15 @@ public class DashConducteurController implements Initializable {
         alert.showAndWait();
     }
 
-
     public void setInterventionsList(ObservableList<Intervention> interventionsList) {
         this.interventionsList = interventionsList;
         interventionsTable.setItems(interventionsList);
+        updateStatistics();
+    }
+
+    // Méthode pour rafraîchir les données
+    public void refreshData() {
+        loadDataFromDatabase();
         updateStatistics();
     }
 }

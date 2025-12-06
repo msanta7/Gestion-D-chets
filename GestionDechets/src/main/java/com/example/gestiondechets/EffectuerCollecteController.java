@@ -6,8 +6,10 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ResourceBundle;
 
 public class EffectuerCollecteController implements Initializable {
@@ -15,161 +17,227 @@ public class EffectuerCollecteController implements Initializable {
     @FXML private TextField idInterventionField;
     @FXML private TextField quantiteField;
     @FXML private DatePicker dateCollectePicker;
-    @FXML private ComboBox<String> statutComboBox;
     @FXML private Label messageLabel;
-    @FXML private Button validerBtn;
-    @FXML private Button annulerBtn;
 
-    private HistoriqueCollectesController.CollecteAjouteeCallback callback;
+    private int agentCollecteurId = getExistingAgentId(); // Changez ceci
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialiser le DatePicker avec la date d'aujourd'hui
         dateCollectePicker.setValue(LocalDate.now());
+        setupValidationListeners();
+    }
 
-        // Remplir le ComboBox de statut
-        statutComboBox.getItems().addAll("Planifiée", "En cours", "Terminée", "Annulée");
-        statutComboBox.setValue("Terminée");
+    private int getExistingAgentId() {
+        // Chercher un utilisateur avec le rôle 'agent_tri'
+        try (Connection conn = Database.connectDB()) {
+            if (conn != null) {
+                String query = "SELECT id_utilisateur FROM UTILISATEUR WHERE role = 'agent_tri' LIMIT 1";
+                try (Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery(query)) {
 
-        // Validation numérique pour la quantité
+                    if (rs.next()) {
+                        return rs.getInt("id_utilisateur");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Par défaut, retourner 1 (premier utilisateur)
+        return 1;
+    }
+
+    // Le reste du code reste identique...
+    private void setupValidationListeners() {
+        idInterventionField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                idInterventionField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
         quantiteField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*(\\.\\d*)?")) {
-                quantiteField.setText(oldValue);
+            if (!newValue.matches("\\d*\\.?\\d*")) {
+                quantiteField.setText(newValue.replaceAll("[^\\d\\.]", ""));
             }
         });
     }
 
-    public void setOnCollecteAjoutee(HistoriqueCollectesController.CollecteAjouteeCallback callback) {
-        this.callback = callback;
-    }
-
     @FXML
     private void valider() {
-        if (!validateForm()) {
+        if (!validateFields()) {
             return;
         }
 
         try {
-            // Récupérer les données
             int idIntervention = Integer.parseInt(idInterventionField.getText().trim());
             double quantite = Double.parseDouble(quantiteField.getText().trim());
-            LocalDate dateCollecte = dateCollectePicker.getValue();
-            String statut = statutComboBox.getValue();
+            LocalDate date = dateCollectePicker.getValue();
+            LocalTime time = LocalTime.now();
+            LocalDateTime dateTime = LocalDateTime.of(date, time);
 
-            // Créer l'objet Collecte
-            Collecte collecte = new Collecte();
-            collecte.setIdIntervention(idIntervention);
-            collecte.setQuantiteCollectee(quantite);
-            collecte.setDateCollecte(dateCollecte.atStartOfDay());
-            collecte.setStatut(statut);
-            collecte.setIdAgentCollecteur(2); // ID de l'agent connecté
-
-            // Ici, sauvegarder dans la base de données
-            // collecteDAO.save(collecte);
-            System.out.println("Nouvelle collecte ajoutée: " + collecte);
-
-            // Afficher message de succès
-            messageLabel.setText("✓ Collecte ajoutée avec succès !");
-            messageLabel.setStyle("-fx-text-fill: #2ecc71;");
-
-            // Désactiver le bouton valider
-            validerBtn.setDisable(true);
-
-            // Fermer la popup après 2 secondes
-            new Thread(() -> {
-                try {
-                    Thread.sleep(2000);
-                    javafx.application.Platform.runLater(() -> {
-                        // Appeler le callback pour rafraîchir le tableau principal
-                        if (callback != null) {
-                            callback.onCollecteAjoutee();
-                        }
-
-                        // Fermer la fenêtre
-                        Stage stage = (Stage) validerBtn.getScene().getWindow();
-                        stage.close();
-                    });
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-        } catch (Exception e) {
-            showError("Erreur: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void annuler() {
-        Stage stage = (Stage) annulerBtn.getScene().getWindow();
-        stage.close();
-    }
-
-    private boolean validateForm() {
-        // Vérifier ID intervention
-        if (idInterventionField.getText().trim().isEmpty()) {
-            showError("L'ID de l'intervention est requis");
-            idInterventionField.requestFocus();
-            return false;
-        }
-
-        try {
-            int id = Integer.parseInt(idInterventionField.getText().trim());
-            if (id <= 0) {
-                showError("ID d'intervention invalide");
-                return false;
+            // Vérifier si l'intervention existe
+            if (!interventionExists(idIntervention)) {
+                messageLabel.setText("Erreur: L'intervention #" + idIntervention + " n'existe pas.");
+                messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+                return;
             }
+
+            // Vérifier si l'agent existe
+            if (!agentExists(agentCollecteurId)) {
+                messageLabel.setText("Erreur: L'agent collecteur #" + agentCollecteurId + " n'existe pas.");
+                messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+                return;
+            }
+
+            boolean success = insertCollecte(idIntervention, quantite, dateTime, agentCollecteurId);
+
+            if (success) {
+                messageLabel.setText("Collecte ajoutée avec succès !");
+                messageLabel.setStyle("-fx-text-fill: #27ae60;");
+
+                resetForm();
+
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                javafx.application.Platform.runLater(() -> {
+                                    ((Stage) messageLabel.getScene().getWindow()).close();
+                                });
+                            }
+                        },
+                        1500
+                );
+            } else {
+                messageLabel.setText("Erreur lors de l'ajout de la collecte.");
+                messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            }
+
         } catch (NumberFormatException e) {
-            showError("ID d'intervention doit être un nombre");
+            messageLabel.setText("Erreur de format des nombres.");
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+        } catch (Exception e) {
+            e.printStackTrace();
+            messageLabel.setText("Erreur: " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+        }
+    }
+
+    private boolean agentExists(int agentId) {
+        try (Connection conn = Database.connectDB()) {
+            if (conn != null) {
+                String query = "SELECT COUNT(*) FROM UTILISATEUR WHERE id_utilisateur = ? AND role = 'agent_tri'";
+                try (PreparedStatement pst = conn.prepareStatement(query)) {
+                    pst.setInt(1, agentId);
+                    try (ResultSet rs = pst.executeQuery()) {
+                        if (rs.next()) {
+                            return rs.getInt(1) > 0;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean interventionExists(int idIntervention) {
+        try (Connection conn = Database.connectDB()) {
+            if (conn != null) {
+                String query = "SELECT COUNT(*) FROM INTERVENTION WHERE id_intervention = ?";
+                try (PreparedStatement pst = conn.prepareStatement(query)) {
+                    pst.setInt(1, idIntervention);
+                    try (ResultSet rs = pst.executeQuery()) {
+                        if (rs.next()) {
+                            return rs.getInt(1) > 0;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean insertCollecte(int idIntervention, double quantite, LocalDateTime dateTime, int agentCollecteurId) {
+        try (Connection conn = Database.connectDB()) {
+            if (conn != null) {
+                String insertQuery = """
+                    INSERT INTO COLLECTE 
+                    (id_intervention, quantite_collectee, date_collecte, id_agent_collecteur) 
+                    VALUES (?, ?, ?, ?)
+                """;
+
+                try (PreparedStatement pst = conn.prepareStatement(insertQuery)) {
+                    pst.setInt(1, idIntervention);
+                    pst.setDouble(2, quantite);
+                    pst.setTimestamp(3, Timestamp.valueOf(dateTime));
+                    pst.setInt(4, agentCollecteurId);
+
+                    int rowsAffected = pst.executeUpdate();
+                    return rowsAffected > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            messageLabel.setText("Erreur SQL: " + e.getMessage() +
+                    "\nAssurez-vous que l'agent #" + agentCollecteurId + " existe dans la table UTILISATEUR.");
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+        }
+        return false;
+    }
+
+    private boolean validateFields() {
+        if (idInterventionField.getText().trim().isEmpty()) {
+            messageLabel.setText("Veuillez entrer un ID d'intervention.");
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
             return false;
         }
 
-        // Vérifier quantité
         if (quantiteField.getText().trim().isEmpty()) {
-            showError("La quantité est requise");
-            quantiteField.requestFocus();
+            messageLabel.setText("Veuillez entrer une quantité.");
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
             return false;
         }
 
         try {
             double quantite = Double.parseDouble(quantiteField.getText().trim());
             if (quantite <= 0) {
-                showError("La quantité doit être supérieure à 0");
-                return false;
-            }
-            if (quantite > 10000) {
-                showError("La quantité ne peut pas dépasser 10000 kg");
+                messageLabel.setText("La quantité doit être supérieure à 0.");
+                messageLabel.setStyle("-fx-text-fill: #e74c3c;");
                 return false;
             }
         } catch (NumberFormatException e) {
-            showError("Quantité invalide. Utilisez un nombre (ex: 150.5)");
+            messageLabel.setText("Quantité invalide.");
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
             return false;
         }
 
-        // Vérifier date
         if (dateCollectePicker.getValue() == null) {
-            showError("La date de collecte est requise");
-            dateCollectePicker.requestFocus();
-            return false;
-        }
-
-        // Vérifier que la date n'est pas dans le futur
-        if (dateCollectePicker.getValue().isAfter(LocalDate.now())) {
-            showError("La date de collecte ne peut pas être dans le futur");
-            return false;
-        }
-
-        // Vérifier statut
-        if (statutComboBox.getValue() == null) {
-            showError("Le statut est requis");
+            messageLabel.setText("Veuillez sélectionner une date.");
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
             return false;
         }
 
         return true;
     }
 
-    private void showError(String message) {
-        messageLabel.setText("✗ " + message);
-        messageLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+    private void resetForm() {
+        idInterventionField.clear();
+        quantiteField.clear();
+        dateCollectePicker.setValue(LocalDate.now());
+    }
+
+    @FXML
+    private void annuler() {
+        Stage stage = (Stage) messageLabel.getScene().getWindow();
+        stage.close();
+    }
+
+    public void setAgentCollecteurId(int agentId) {
+        this.agentCollecteurId = agentId;
     }
 }

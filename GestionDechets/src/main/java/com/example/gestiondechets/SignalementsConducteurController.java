@@ -8,12 +8,13 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.beans.property.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.event.ActionEvent;
 import java.io.IOException;
+import java.sql.*;
+import model.Signalements.Signalement;
 
 public class SignalementsConducteurController {
 
@@ -24,13 +25,7 @@ public class SignalementsConducteurController {
     @FXML private TableColumn<Signalement, String> descriptionCol;
     @FXML private TableColumn<Signalement, String> statutCol;
 
-    @FXML private TextField searchField;
-    @FXML private ComboBox<String> filterStatus;
-
     @FXML private Label nomConducteurLabel;
-    @FXML private Label signalementsAssignesLabel;
-    @FXML private Label signalementsNouveauxLabel;
-    @FXML private Label signalementsEnCoursLabel;
 
     private ObservableList<Signalement> signalementsList = FXCollections.observableArrayList();
 
@@ -39,138 +34,208 @@ public class SignalementsConducteurController {
         // Configurer le nom du conducteur
         nomConducteurLabel.setText("Conducteur");
 
-        // Configurer les colonnes
-        idCol.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
-        dateCol.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-        adresseCol.setCellValueFactory(cellData -> cellData.getValue().adresseProperty());
-        descriptionCol.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
-        statutCol.setCellValueFactory(cellData -> cellData.getValue().statutProperty());
+        // Configurer les colonnes du tableau
+        configurerColonnes();
 
-
-        // Charger les données
-        chargerDonneesTest();
-
+        // Charger les données depuis la base de données
+        chargerSignalementsDepuisBD();
     }
 
-    private void chargerDonneesTest() {
+    private void configurerColonnes() {
+        // Colonne ID
+        idCol.setCellValueFactory(cellData -> {
+            Signalement signalement = cellData.getValue();
+            return new SimpleIntegerProperty(signalement.getId()).asObject();
+        });
+
+        // Colonne Date
+        dateCol.setCellValueFactory(cellData -> {
+            Signalement signalement = cellData.getValue();
+            return new SimpleStringProperty(signalement.getDate());
+        });
+
+        // Colonne Adresse (utilise localisation)
+        adresseCol.setCellValueFactory(cellData -> {
+            Signalement signalement = cellData.getValue();
+            return new SimpleStringProperty(signalement.getLocalisation());
+        });
+
+        // Colonne Description
+        descriptionCol.setCellValueFactory(cellData -> {
+            Signalement signalement = cellData.getValue();
+            return new SimpleStringProperty(signalement.getDescription());
+        });
+
+        // Colonne Statut (utilise etat)
+        statutCol.setCellValueFactory(cellData -> {
+            Signalement signalement = cellData.getValue();
+            return new SimpleStringProperty(signalement.getEtat());
+        });
+
+        // Optionnel: Ajouter un écouteur pour double-clic
+        signalementsTable.setRowFactory(tv -> {
+            TableRow<Signalement> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Signalement selected = row.getItem();
+                    afficherDetailsSignalement(selected);
+                }
+            });
+            return row;
+        });
+    }
+
+    private void chargerSignalementsDepuisBD() {
         signalementsList.clear();
 
-        // Données de test pour un conducteur
-        signalementsList.add(new Signalement(1001, "15/01/2024 08:30", "123 Rue Principale, Centre-ville", "Déchets encombrants abandonnés sur le trottoir", "Nouveau"));
-        signalementsList.add(new Signalement(1002, "14/01/2024 14:15", "456 Avenue du Parc, Quartier Nord", "Poubelle publique renversée par le vent", "Nouveau"));
-        signalementsList.add(new Signalement(1003, "13/01/2024 10:45", "789 Boulevard Central, Zone Est", "Conteneur à verre plein à craquer", "En cours"));
-        signalementsList.add(new Signalement(1004, "12/01/2024 16:20", "321 Rue Secondaire, Secteur Ouest", "Déchets verts non collectés depuis 3 jours", "Nouveau"));
-        signalementsList.add(new Signalement(1005, "11/01/2024 09:10", "654 Place du Marché", "Ordures ménagères répandues par les animaux", "Nouveau"));
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
 
-        signalementsTable.setItems(signalementsList);
-    }
-
-
-    @FXML
-    private void handleFilter() {
-        String statutSelectionne = filterStatus.getValue();
-
-        if ("Tous les statuts".equals(statutSelectionne)) {
-            signalementsTable.setItems(signalementsList);
-        } else {
-            ObservableList<Signalement> filteredList = FXCollections.observableArrayList();
-            for (Signalement s : signalementsList) {
-                if (s.getStatut().equals(statutSelectionne)) {
-                    filteredList.add(s);
-                }
+        try {
+            conn = Database.connectDB();
+            if (conn == null) {
+                showError("Erreur de connexion", "Impossible de se connecter à la base de données");
+                chargerDonneesTest();
+                return;
             }
-            signalementsTable.setItems(filteredList);
+
+            stmt = conn.createStatement();
+
+            // Récupérer les signalements depuis la table SIGNALEMENT
+            String query = "SELECT id_signalement, date_signalement, adresse, description, etat " +
+                    "FROM SIGNALEMENT " +
+                    "ORDER BY date_signalement DESC";
+
+            rs = stmt.executeQuery(query);
+
+            int count = 0;
+            while (rs.next()) {
+                // Créer un Signalement avec les données de la BD
+                // Note: La table a moins de champs que la classe Signalement
+                Signalement signalement = new Signalement(
+                        rs.getInt("id_signalement"),      // id
+                        formaterDate(rs.getString("date_signalement")), // date
+                        "Non disponible",                 // citoyen (valeur par défaut)
+                        "Non spécifié",                   // typeDechet (valeur par défaut)
+                        rs.getString("adresse"),          // localisation
+                        "Normal",                         // urgence (valeur par défaut)
+                        traduireStatut(rs.getString("etat")), // etat
+                        "N/A",                            // telephone (valeur par défaut)
+                        rs.getString("description")       // description
+                );
+                signalementsList.add(signalement);
+                count++;
+            }
+
+            System.out.println("Signalements chargés: " + count);
+            signalementsTable.setItems(signalementsList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Erreur de base de données",
+                    "Erreur lors du chargement des signalements: " + e.getMessage());
+
+            // Charger des données de test en cas d'erreur
+            chargerDonneesTest();
+        } finally {
+            // Fermer les ressources
+            fermerRessources(rs, stmt, conn);
         }
     }
 
-    @FXML
-    private void handleRefresh() {
-        // Recharger les données
-        chargerDonneesTest();
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Rafraîchissement");
-        alert.setHeaderText(null);
-        alert.setContentText("Liste des signalements rafraîchie avec succès !");
-        alert.showAndWait();
+    private String formaterDate(String dateSQL) {
+        if (dateSQL == null || dateSQL.isEmpty()) {
+            return "Date inconnue";
+        }
+        try {
+            // Si la date est au format SQL (2024-01-15 08:30:00), on peut la formater
+            return dateSQL.substring(0, 16); // Garde "2024-01-15 08:30"
+        } catch (Exception e) {
+            return dateSQL;
+        }
     }
 
-    private void ouvrirDetailsSignalement(Signalement signalement) {
+    private String traduireStatut(String statutSQL) {
+        if (statutSQL == null) return "Inconnu";
+
+        switch (statutSQL.toLowerCase()) {
+            case "nouveau": return "Nouveau";
+            case "en_cours": return "En cours";
+            case "termine": return "Terminé";
+            case "annule": return "Annulé";
+            default: return statutSQL;
+        }
+    }
+
+    private void fermerRessources(ResultSet rs, Statement stmt, Connection conn) {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void afficherDetailsSignalement(Signalement signalement) {
         Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Détails du Signalement #" + signalement.getId());
-        dialog.setHeaderText("Signalement du " + signalement.getDate());
+        dialog.setTitle("Détails du Signalement");
+        dialog.setHeaderText("Signalement #" + signalement.getId());
 
         VBox content = new VBox(10);
         content.setPadding(new javafx.geometry.Insets(20));
 
-        Label adresseLabel = new Label("Adresse: " + signalement.getAdresse());
+        // Créer les labels avec les informations
+        Label idLabel = new Label("ID: " + signalement.getId());
+        Label dateLabel = new Label("Date: " + signalement.getDate());
+        Label adresseLabel = new Label("Adresse: " + signalement.getLocalisation());
         Label descriptionLabel = new Label("Description: " + signalement.getDescription());
-        Label statutLabel = new Label("Statut: " + signalement.getStatut());
+        Label statutLabel = new Label("Statut: " + signalement.getEtat());
+        Label typeLabel = new Label("Type de déchet: " + signalement.getTypeDechet());
+        Label urgenceLabel = new Label("Urgence: " + signalement.getUrgence());
+        Label citoyenLabel = new Label("Citoyen: " + signalement.getCitoyen());
 
-        adresseLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-        descriptionLabel.setStyle("-fx-font-size: 14px;");
+        // Style des labels
         descriptionLabel.setWrapText(true);
         descriptionLabel.setMaxWidth(400);
-        statutLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        statutLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #006666;");
 
-        content.getChildren().addAll(adresseLabel, descriptionLabel, statutLabel);
+        content.getChildren().addAll(
+                idLabel, dateLabel, adresseLabel, descriptionLabel,
+                statutLabel, typeLabel, urgenceLabel, citoyenLabel
+        );
 
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
         dialog.showAndWait();
     }
 
-    private void modifierStatutSignalement(Signalement signalement) {
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(signalement.getStatut(),
-                "Nouveau", "Assigné", "En cours", "Résolu");
-        dialog.setTitle("Modifier le statut");
-        dialog.setHeaderText("Signalement #" + signalement.getId());
-        dialog.setContentText("Sélectionnez le nouveau statut:");
+    // Méthode de secours pour les données de test
+    private void chargerDonneesTest() {
+        signalementsList.clear();
 
-        dialog.showAndWait().ifPresent(nouveauStatut -> {
-            signalement.setStatut(nouveauStatut);
-            signalementsTable.refresh();
+        System.out.println("Chargement des données de test...");
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Statut modifié");
-            alert.setHeaderText(null);
-            alert.setContentText("Le statut du signalement #" + signalement.getId() + " a été modifié en: " + nouveauStatut);
-            alert.showAndWait();
-        });
+        signalementsTable.setItems(signalementsList);
+        System.out.println("Données de test chargées: " + signalementsList.size() + " signalements");
     }
 
     // === MÉTHODES DE NAVIGATION ===
     @FXML
     private void showDashboard(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboard-conducteur.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Erreur de navigation", "Impossible de charger le tableau de bord");
-        }
+        naviguerVers("DashConducteur.fxml", event);
     }
 
     @FXML
     private void showCollecte(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("collecte.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Erreur de navigation", "Impossible de charger la page de collecte");
-        }
+        naviguerVers("historique-collecte.fxml", event);
     }
 
     @FXML
     private void showSignalements(ActionEvent event) {
-        // Déjà sur cette page, rien à faire
+        // Rafraîchir les données quand on clique sur ce menu
+        chargerSignalementsDepuisBD();
     }
 
     @FXML
@@ -181,18 +246,22 @@ public class SignalementsConducteurController {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
-                    Parent root = loader.load();
-                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    showError("Erreur de déconnexion", "Impossible de charger la page de connexion");
-                }
+                naviguerVers("login.fxml", event);
             }
         });
+    }
+
+    private void naviguerVers(String fxmlFile, ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Erreur de navigation", "Impossible de charger: " + fxmlFile);
+        }
     }
 
     private void showError(String titre, String message) {
@@ -202,5 +271,4 @@ public class SignalementsConducteurController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 }

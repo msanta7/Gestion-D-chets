@@ -1,140 +1,311 @@
 package com.example.gestiondechets;
 
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ResourceBundle;
 
-public class addInterventionController {
+public class addInterventionController implements Initializable {
 
     @FXML private TextField idSignalementField;
     @FXML private DatePicker datePlanificationPicker;
     @FXML private ComboBox<String> heurePlanificationCombo;
-    @FXML private ComboBox<String> statutCombo;
+    @FXML private ComboBox<String> statutCombo; // CHANGÉ: statutComboBox -> statutCombo
     @FXML private TextArea notesArea;
+    @FXML private Label messageLabel;
     @FXML private Label adresseLabel;
     @FXML private Label descriptionLabel;
     @FXML private Label etatLabel;
-    @FXML private Label messageLabel;
     @FXML private Button validerBtn;
     @FXML private Button annulerBtn;
     @FXML private Button rechercherSignalementBtn;
 
     private Stage popupStage;
-    private DashConducteurController mainController;
     private int idConducteurConnecte;
+    private DashConducteurController mainController;
+    private Intervention interventionAModifier;
+    private boolean enModeModification = false;
 
-    @FXML
-    private void initialize() {
-        // Initialiser les heures (8h-18h)
-        for (int i = 8; i <= 18; i++) {
-            heurePlanificationCombo.getItems().add(String.format("%02d:00", i));
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // Initialiser les ComboBox
+        if (statutCombo != null) {
+            statutCombo.getItems().addAll("planifiee", "en_cours", "terminee", "annulee");
+            statutCombo.setValue("planifiee");
         }
-        heurePlanificationCombo.setValue("09:00");
 
-        // Initialiser les statuts selon l'ENUM de la base
-        statutCombo.getItems().addAll("planifiee", "en_cours", "terminee", "annulee");
-        statutCombo.setValue("planifiee");
+        if (heurePlanificationCombo != null) {
+            // Ajouter les heures de 8h à 18h
+            for (int i = 8; i <= 18; i++) {
+                String heure = String.format("%02d:00", i);
+                heurePlanificationCombo.getItems().add(heure);
+            }
+            heurePlanificationCombo.setValue("08:00");
+        }
 
-        // Définir la date d'aujourd'hui
-        datePlanificationPicker.setValue(LocalDate.now());
+        // Initialiser les labels
+        adresseLabel.setText("Non sélectionné");
+        descriptionLabel.setText("Non sélectionné");
+        etatLabel.setText("Non sélectionné");
 
-        // Initialiser les labels d'information
-        clearSignalementInfo();
+        // Configurer la validation
+        setupValidation();
 
-        // Configurer les actions des boutons
-        validerBtn.setOnAction(event -> handleValider());
-        annulerBtn.setOnAction(event -> handleAnnuler());
+        // Configurer les boutons
+        if (annulerBtn != null) {
+            annulerBtn.setOnAction(e -> handleAnnuler());
+        }
+
         if (rechercherSignalementBtn != null) {
-            rechercherSignalementBtn.setOnAction(event -> rechercherSignalement());
+            rechercherSignalementBtn.setOnAction(e -> rechercherSignalement());
+        }
+    }
+
+    private void setupValidation() {
+        if (validerBtn != null) {
+            validerBtn.setDisable(true);
+        }
+
+        if (idSignalementField != null) {
+            idSignalementField.textProperty().addListener((obs, oldVal, newVal) -> {
+                validateForm();
+            });
+        }
+
+        if (datePlanificationPicker != null) {
+            datePlanificationPicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+                validateForm();
+            });
+        }
+
+        if (heurePlanificationCombo != null) {
+            heurePlanificationCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+                validateForm();
+            });
+        }
+    }
+
+    private void validateForm() {
+        boolean isValid = true;
+
+        // Vérifier ID signalement
+        if (idSignalementField != null) {
+            isValid = !idSignalementField.getText().trim().isEmpty();
+            if (isValid) {
+                try {
+                    Integer.parseInt(idSignalementField.getText().trim());
+                } catch (NumberFormatException e) {
+                    isValid = false;
+                }
+            }
+        }
+
+        // Vérifier date
+        if (datePlanificationPicker != null) {
+            isValid = isValid && datePlanificationPicker.getValue() != null;
+        }
+
+        // Vérifier heure
+        if (heurePlanificationCombo != null) {
+            isValid = isValid && heurePlanificationCombo.getValue() != null;
+        }
+
+        if (validerBtn != null) {
+            validerBtn.setDisable(!isValid);
         }
     }
 
     @FXML
     private void rechercherSignalement() {
-        String idText = idSignalementField.getText().trim();
-        if (idText.isEmpty()) {
-            showError("Veuillez entrer un ID de signalement");
-            return;
-        }
-
         try {
+            String idText = idSignalementField.getText().trim();
+            if (idText.isEmpty()) {
+                showError("Veuillez entrer un ID de signalement");
+                return;
+            }
+
             int idSignalement = Integer.parseInt(idText);
-            // Ici, normalement vous feriez une requête à la base de données
-            // Pour l'exemple, on simule des données
-            if (idSignalement >= 1 && idSignalement <= 10) {
-                adresseLabel.setText("Adresse du signalement #" + idSignalement);
-                descriptionLabel.setText("Description du signalement");
-                etatLabel.setText("nouveau");
-                messageLabel.setText("✓ Signalement trouvé");
-                messageLabel.setStyle("-fx-text-fill: #2ecc71;");
-            } else {
-                showError("Signalement non trouvé");
-                clearSignalementInfo();
+
+            // Rechercher le signalement dans la base de données
+            java.sql.Connection conn = Database.connectDB();
+            if (conn != null) {
+                String query = "SELECT adresse, description, etat FROM SIGNALEMENT WHERE id_signalement = ?";
+                java.sql.PreparedStatement pst = conn.prepareStatement(query);
+                pst.setInt(1, idSignalement);
+                java.sql.ResultSet rs = pst.executeQuery();
+
+                if (rs.next()) {
+                    // Afficher les informations
+                    adresseLabel.setText(rs.getString("adresse"));
+                    descriptionLabel.setText(rs.getString("description") != null ? rs.getString("description") : "Aucune");
+                    etatLabel.setText(translateEtat(rs.getString("etat")));
+
+                    // Vérifier si une intervention existe déjà pour ce signalement
+                    if (!enModeModification && checkSignalementHasIntervention(idSignalement)) {
+                        showError("ATTENTION: Ce signalement a déjà une intervention associée");
+                    } else {
+                        showSuccess("Signalement trouvé");
+                    }
+                } else {
+                    showError("Signalement non trouvé");
+                    adresseLabel.setText("Non trouvé");
+                    descriptionLabel.setText("Non trouvé");
+                    etatLabel.setText("Non trouvé");
+                }
+
+                conn.close();
             }
         } catch (NumberFormatException e) {
-            showError("ID invalide. Doit être un nombre");
+            showError("ID invalide. Veuillez entrer un nombre.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de la recherche: " + e.getMessage());
+        }
+    }
+
+    private String translateEtat(String etat) {
+        if (etat == null) return "Inconnu";
+        switch(etat.toLowerCase()) {
+            case "nouveau": return "Nouveau";
+            case "en_cours": return "En Cours";
+            case "termine": return "Terminé";
+            case "annule": return "Annulé";
+            default: return etat;
+        }
+    }
+
+    private boolean checkSignalementHasIntervention(int idSignalement) {
+        try {
+            java.sql.Connection conn = Database.connectDB();
+            String query = "SELECT COUNT(*) FROM INTERVENTION WHERE id_signalement = ?";
+            java.sql.PreparedStatement pst = conn.prepareStatement(query);
+            pst.setInt(1, idSignalement);
+            java.sql.ResultSet rs = pst.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                conn.close();
+                return true;
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void setPopupStage(Stage stage) {
+        this.popupStage = stage;
+    }
+
+    public void setIdConducteurConnecte(int id) {
+        this.idConducteurConnecte = id;
+    }
+
+    public void setMainController(DashConducteurController controller) {
+        this.mainController = controller;
+    }
+
+    public void preRemplirFormulaire(Intervention intervention) {
+        this.interventionAModifier = intervention;
+        this.enModeModification = true;
+
+        // Pré-remplir les champs
+        if (idSignalementField != null) {
+            idSignalementField.setText(String.valueOf(intervention.getIdSignalement()));
+            idSignalementField.setDisable(true);
+            // Charger automatiquement les informations du signalement
+            rechercherSignalement();
+        }
+
+        if (datePlanificationPicker != null && intervention.getDatePlanification() != null) {
+            datePlanificationPicker.setValue(intervention.getDatePlanification().toLocalDate());
+
+            // Extraire l'heure
+            String heure = String.format("%02d:00", intervention.getDatePlanification().getHour());
+            if (heurePlanificationCombo != null) {
+                heurePlanificationCombo.setValue(heure);
+            }
+        }
+
+        if (statutCombo != null && intervention.getStatut() != null) {
+            statutCombo.setValue(intervention.getStatut());
+        }
+
+        if (notesArea != null && intervention.getNotes() != null) {
+            notesArea.setText(intervention.getNotes());
+        }
+
+        // Désactiver le bouton recherche en mode modification
+        if (rechercherSignalementBtn != null) {
+            rechercherSignalementBtn.setDisable(true);
         }
     }
 
     @FXML
     private void handleValider() {
-        if (!validateForm()) {
+        if (!validateInputs()) {
             return;
         }
 
         try {
+            // Récupérer les données
             int idSignalement = Integer.parseInt(idSignalementField.getText().trim());
-            LocalDate date = datePlanificationPicker.getValue();
-            String heure = heurePlanificationCombo.getValue();
-            String statut = statutCombo.getValue();
-            String notes = notesArea.getText().trim();
 
             // Combiner date et heure
-            LocalDateTime dateTime = LocalDateTime.of(date,
-                    LocalTime.parse(heure, DateTimeFormatter.ofPattern("HH:mm")));
+            LocalDate date = datePlanificationPicker.getValue();
+            String[] heureParts = heurePlanificationCombo.getValue().split(":");
+            LocalTime time = LocalTime.of(Integer.parseInt(heureParts[0]), Integer.parseInt(heureParts[1]));
+            LocalDateTime datePlanification = LocalDateTime.of(date, time);
 
-            // Créer l'intervention
-            Intervention intervention = new Intervention(
-                    idSignalement,
-                    dateTime,
-                    statut,
-                    notes
-            );
+            String statut = statutCombo != null ? statutCombo.getValue() : "planifiee";
+            String notes = notesArea != null ? notesArea.getText().trim() : "";
 
-            // Ajouter les infos du signalement si disponibles
-            intervention.setAdresseSignalement(adresseLabel.getText());
-            intervention.setDescriptionSignalement(descriptionLabel.getText());
-            intervention.setEtatSignalement(etatLabel.getText());
-            intervention.setIdConducteur(this.idConducteurConnecte);
+            if (enModeModification && interventionAModifier != null) {
+                // MODE MODIFICATION
+                interventionAModifier.setDatePlanification(datePlanification);
+                interventionAModifier.setStatut(statut);
+                interventionAModifier.setNotes(notes);
 
-            // Passer au contrôleur principal
-            if (mainController != null) {
-                mainController.ajouterNouvelleIntervention(intervention);
+                mainController.modifierInterventionExistante(interventionAModifier);
+                popupStage.close();
+
+            } else {
+                // MODE AJOUT - vérifier qu'il n'y a pas déjà une intervention
+                if (checkSignalementHasIntervention(idSignalement)) {
+                    showError("Ce signalement a déjà une intervention associée");
+                    return;
+                }
+
+                // Créer nouvelle intervention
+                Intervention nouvelleIntervention = new Intervention();
+                nouvelleIntervention.setIdSignalement(idSignalement);
+                nouvelleIntervention.setDatePlanification(datePlanification);
+                nouvelleIntervention.setStatut(statut);
+                nouvelleIntervention.setNotes(notes);
+                nouvelleIntervention.setIdConducteur(idConducteurConnecte);
+
+                mainController.ajouterNouvelleIntervention(nouvelleIntervention);
+
+                // Fermer la popup après un court délai
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1500);
+                        javafx.application.Platform.runLater(() -> {
+                            popupStage.close();
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
 
-            // Message de succès
-            messageLabel.setText("✓ Intervention créée avec succès!");
-            messageLabel.setStyle("-fx-text-fill: #2ecc71;");
-
-            // Fermer après délai
-            new Thread(() -> {
-                try {
-                    Thread.sleep(1500);
-                    javafx.application.Platform.runLater(() -> {
-                        if (popupStage != null) {
-                            popupStage.close();
-                        }
-                    });
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
         } catch (Exception e) {
+            e.printStackTrace();
             showError("Erreur: " + e.getMessage());
         }
     }
@@ -146,28 +317,33 @@ public class addInterventionController {
         }
     }
 
-    private boolean validateForm() {
+    private boolean validateInputs() {
         // Vérifier ID signalement
-        if (idSignalementField.getText().trim().isEmpty()) {
+        if (idSignalementField == null || idSignalementField.getText().trim().isEmpty()) {
             showError("L'ID du signalement est requis");
             return false;
         }
 
+        try {
+            int idSignalement = Integer.parseInt(idSignalementField.getText().trim());
+            if (idSignalement <= 0) {
+                showError("ID signalement invalide");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            showError("ID signalement doit être un nombre");
+            return false;
+        }
+
         // Vérifier date
-        if (datePlanificationPicker.getValue() == null) {
+        if (datePlanificationPicker == null || datePlanificationPicker.getValue() == null) {
             showError("La date de planification est requise");
             return false;
         }
 
         // Vérifier heure
-        if (heurePlanificationCombo.getValue() == null) {
+        if (heurePlanificationCombo == null || heurePlanificationCombo.getValue() == null) {
             showError("L'heure de planification est requise");
-            return false;
-        }
-
-        // Vérifier que la date n'est pas dans le passé
-        if (datePlanificationPicker.getValue().isBefore(LocalDate.now())) {
-            showError("La date ne peut pas être dans le passé");
             return false;
         }
 
@@ -175,52 +351,16 @@ public class addInterventionController {
     }
 
     private void showError(String message) {
-        messageLabel.setText("✗ " + message);
-        messageLabel.setStyle("-fx-text-fill: #e74c3c;");
-    }
-
-    private void clearSignalementInfo() {
-        adresseLabel.setText("");
-        descriptionLabel.setText("");
-        etatLabel.setText("");
-    }
-
-    // Méthode pour pré-remplir le formulaire (pour la modification)
-    public void preRemplirFormulaire(Intervention intervention) {
-        if (intervention != null) {
-            idSignalementField.setText(String.valueOf(intervention.getIdSignalement()));
-            idSignalementField.setDisable(true); // Ne pas permettre de modifier l'ID
-
-            if (intervention.getDatePlanification() != null) {
-                datePlanificationPicker.setValue(intervention.getDatePlanification().toLocalDate());
-                heurePlanificationCombo.setValue(
-                        intervention.getDatePlanification().format(DateTimeFormatter.ofPattern("HH:mm"))
-                );
-            }
-
-            statutCombo.setValue(intervention.getStatut());
-            notesArea.setText(intervention.getNotes());
-
-            // Afficher les infos du signalement
-            adresseLabel.setText(intervention.getAdresseSignalement());
-            descriptionLabel.setText(intervention.getDescriptionSignalement());
-            etatLabel.setText(intervention.getEtatSignalement());
-
-            // Changer le texte du bouton pour la modification
-            validerBtn.setText("Modifier");
+        if (messageLabel != null) {
+            messageLabel.setText("✗ " + message);
+            messageLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
         }
     }
 
-    // Setters pour les références
-    public void setPopupStage(Stage stage) {
-        this.popupStage = stage;
-    }
-
-    public void setMainController(DashConducteurController controller) {
-        this.mainController = controller;
-    }
-
-    public void setIdConducteurConnecte(int id) {
-        this.idConducteurConnecte = id;
+    private void showSuccess(String message) {
+        if (messageLabel != null) {
+            messageLabel.setText("✓ " + message);
+            messageLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+        }
     }
 }

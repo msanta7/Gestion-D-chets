@@ -22,9 +22,7 @@ public class LoginController {
     @FXML
     private Button loginButton;
 
-    /**
-     * Méthode pour afficher une boîte de dialogue d'erreur
-     */
+
     private void afficherErreurDialog(String titre, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titre);
@@ -33,9 +31,6 @@ public class LoginController {
         alert.showAndWait();
     }
 
-    /**
-     * Méthode générique pour changer de page FXML
-     */
     private void chargerPage(String fxmlPath) {
         try {
             // Charger le nouveau FXML
@@ -164,13 +159,10 @@ public class LoginController {
             return "CONDUCTEUR";
         }
 
-        // Par défaut, refuser la connexion
         return null;
     }
 
-    /**
-     * Méthode pour afficher une information
-     */
+
     private void afficherInfoDialog(String titre, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titre);

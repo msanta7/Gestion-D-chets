@@ -9,7 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class LoginController {
 
@@ -68,7 +73,7 @@ public class LoginController {
      * Méthode appelée quand on clique sur le bouton de connexion
      */
     @FXML
-    private void handleLogin() {
+    private void handleLogin() throws SQLException {
         String telephone = telephoneField.getText().trim();
         String password = passwordField.getText().trim();
 
@@ -94,88 +99,56 @@ public class LoginController {
         }
 
         // Valider les identifiants et déterminer le rôle
-        String role = validerIdentifiants(telephone, password);
+        String role = validerIdentifiants(telephone,password);
 
+        System.out.println(role);
         if (role != null) {
             // Rediriger vers la page appropriée selon le rôle
-            if (role.equals("ADMIN")) {
+            if (role.equals("administrateur")) {
                 chargerPage("/com/example/gestiondechets/DashAdmin.fxml");
-            } else if (role.equals("CITOYEN")) {
+            } else if (role.equals("citoyen")) {
                 chargerPage("/com/example/gestiondechets/DashCitoyen.fxml");
-            } else if (role.equals("AGENT")) {
+            } else if (role.equals("agent_tri")) {
                 chargerPage("/com/example/gestiondechets/DashTri.fxml");
-            } else if (role.equals("CONDUCTEUR")) {
+            } else if (role.equals("conducteur")) {
                 chargerPage("/com/example/gestiondechets/DashConducteur.fxml");
             }
         } else {
             afficherErreurDialog("Échec de connexion",
                     "Numéro de téléphone ou mot de passe incorrect");
         }
+        Database.loginUserByPhone(telephoneField.getText());
     }
 
     /**
      * Méthode de validation des identifiants avec détection de rôle
      */
-    private String validerIdentifiants(String telephone, String password) {
-        // === ADMINISTRATEURS ===
-        // Admin principal
-        if ("0612345678".equals(telephone) && "admin123".equals(password)) {
-            return "ADMIN";
+    private String validerIdentifiants(String telephone, String password) throws SQLException {
+        if (telephone.isEmpty()) {
+            return "error";
+        }
+        if (password.isEmpty()){
+            return "error";
         }
 
-        // Second admin
-        if ("0623456789".equals(telephone) && "admin456".equals(password)) {
-            return "ADMIN";
-        }
+        try (Connection connection = Database.connectDB()) {
+            String query = "SELECT role " +
+                    "FROM utilisateur u " +
+                    "WHERE u.telephone = ? AND u.mot_de_passe = ?";
 
-        // === CITOYENS ===
-        // Exemple spécifique : 056151551
-        if ("056151551".equals(telephone)) {
-            // Pour ce numéro spécifique, accepter plusieurs mots de passe pour tests
-            if ("citoyen123".equals(password) || "password".equals(password) || "123456".equals(password)) {
-                return "CITOYEN";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, telephone);       // phone number
+            statement.setString(2, password);     // email value
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("role");   // correct phone + email
+            } else {
+                return null;   // incorrect phone OR incorrect email
             }
         }
-
-        // Tous les numéros commençant par 05 (fixe au Maroc) = citoyens
-        // Pour faciliter les tests pendant le développement
-        if (telephone.startsWith("05")) {
-            // Accepter n'importe quel mot de passe pour les numéros 05xxx
-            // Dans une version réelle, il faudrait vérifier en base de données
-            return "CITOYEN";
-        }
-
-        // Numéros mobiles 06/07 peuvent être citoyens aussi
-        if ("0611111111".equals(telephone) && "citoyen456".equals(password)) {
-            return "CITOYEN";
-        }
-
-        if ("0622222222".equals(telephone) && "citoyen789".equals(password)) {
-            return "CITOYEN";
-        }
-
-        // === AGENTS ===
-        if ("0633333333".equals(telephone) && "agent123".equals(password)) {
-            return "AGENT";
-        }
-
-        // === CONDUCTEURS ===
-        if ("0644444444".equals(telephone) && "conducteur123".equals(password)) {
-            return "CONDUCTEUR";
-        }
-
-        // Par défaut, refuser la connexion
-        return null;
     }
 
-    /**
-     * Méthode pour afficher une information
-     */
-    private void afficherInfoDialog(String titre, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titre);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }
+

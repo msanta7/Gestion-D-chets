@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane fx:id="adminRoot" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.GestUsers">
+<AnchorPane fx:id="adminRoot" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.GestUsers">
 
     <!-- Menu latéral -->
     <AnchorPane prefHeight="700.0" prefWidth="250" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0.0">
@@ -28,16 +28,8 @@
             <contentDisplay>LEFT</contentDisplay>
         </Button>
 
-        <!-- Signalements -->
-        <Button fx:id="signalementsBtn" layoutY="167.0" onAction="#showSignalements" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Signalements" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="167.0">
-            <padding>
-                <Insets left="20" />
-            </padding>
-            <contentDisplay>LEFT</contentDisplay>
-        </Button>
-
         <!-- Utilisateurs -->
-        <Button fx:id="usersBtn" layoutY="235.0" onAction="#showUsers" prefHeight="50" prefWidth="250" style="-fx-background-color: #34495e; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="235.0">
+        <Button fx:id="usersBtn" layoutY="147.0" onAction="#showUsers" prefHeight="50" prefWidth="250" style="-fx-background-color: #34495e; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="147.0">
             <padding>
                 <Insets left="20" />
             </padding>
@@ -45,7 +37,7 @@
         </Button>
 
         <!-- Rapports -->
-        <Button fx:id="reportsBtn" layoutY="303.0" onAction="#showReports" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Rapports" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="303.0">
+        <Button fx:id="reportsBtn" layoutY="197.0" onAction="#showReports" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Rapports" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="197.0">
             <padding>
                 <Insets left="20" />
             </padding>
@@ -53,7 +45,7 @@
         </Button>
 
         <!-- Paramètres -->
-        <Button fx:id="settingsBtn" layoutY="375.0" onAction="#showSettings" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Paramétres" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="375.0">
+        <Button fx:id="settingsBtn" layoutY="247.0" onAction="#showSettings" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Paramétres" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="247.0">
             <padding>
                 <Insets left="20" />
             </padding>
@@ -98,7 +90,7 @@
 
             <Label style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" />
 
-            <Button layoutX="20.0" layoutY="55.0" onAction="#openAddUserDialog" prefHeight="35" prefWidth="150" style="-fx-background-color: #006666; -fx-text-fill: white; -fx-background-radius: 5;" text="+ Nouvel utilisateur" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="55" />
+            <Button fx:id="newUser" layoutX="20.0" layoutY="55.0" onAction="#openAddUserDialog" prefHeight="35" prefWidth="150" style="-fx-background-color: #006666; -fx-text-fill: white; -fx-background-radius: 5;" text="+ Nouvel utilisateur" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="55" />
 
             <TextField fx:id="searchField" layoutX="200.0" layoutY="55.0" prefHeight="35" prefWidth="200" promptText="Rechercher..." AnchorPane.leftAnchor="200" AnchorPane.topAnchor="55" />
 
@@ -124,7 +116,8 @@
                 </items>
             </ComboBox>
 
-            <Button layoutX="700.0" layoutY="55.0" onAction="#applyFilters" prefHeight="35" prefWidth="80" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="Filtrer" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="55" />
+            <Button layoutX="696.0" layoutY="55.0" onAction="#applyFilters" prefHeight="35" prefWidth="80" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="Filtrer" AnchorPane.rightAnchor="114.0" AnchorPane.topAnchor="55.0" />
+         <Button fx:id="deleteUser" disable="true" layoutX="796.0" layoutY="55.0" mnemonicParsing="false" onAction="#handleDeleteUser" prefHeight="35.0" prefWidth="80.0" style="-fx-background-radius: 5; -fx-background-color: #da0e0e;" text="supprimer" textFill="WHITE" />
 
         </AnchorPane>
 
@@ -135,12 +128,13 @@
 
             <TableView fx:id="usersTable" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="60">
                 <columns>
-                    <TableColumn prefWidth="50" text="ID" />
-                    <TableColumn prefWidth="167.0" text="Nom complet" />
-                    <TableColumn prefWidth="167.0" text="Téléphone" />
-                    <TableColumn prefWidth="133.0" text="Rôle" />
-                    <TableColumn prefWidth="153.0" text="Date création" />
-                    <TableColumn prefWidth="179.0" text="Actions" />
+                    <TableColumn fx:id="userId" prefWidth="50" text="ID" />
+                    <TableColumn fx:id="accountName" prefWidth="115.0" text="Nom complet" />
+                    <TableColumn fx:id="phoneNumber" prefWidth="104.0" text="Téléphone" />
+               <TableColumn fx:id="userAdresse" prefWidth="194.0" text="adresse" />
+                    <TableColumn fx:id="role" minWidth="0.0" prefWidth="119.0" text="Rôle" />
+                    <TableColumn fx:id="creationDate" prefWidth="159.0" text="Date création" />
+               <TableColumn fx:id="statut" prefWidth="108.0" text="statut" />
                 </columns>
             </TableView>
 

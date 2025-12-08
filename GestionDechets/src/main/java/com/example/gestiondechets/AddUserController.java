@@ -91,7 +91,7 @@ public class AddUserController {
         }
 
         // Insérer dans la base de données
-        if (insererUtilisateurBD(nom, prenom, telephone, adresse, role, password)) {
+        if (Database.addUser(nom, prenom, telephone, adresse, role, password)) {
             // Afficher confirmation
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Utilisateur ajouté");
@@ -106,35 +106,7 @@ public class AddUserController {
         }
     }
 
-    private boolean insererUtilisateurBD(String nom, String prenom, String telephone,
-                                         String adresse, String role, String motDePasse) {
-        // Combiner nom et prénom pour correspondre à la table
-        String nomComplet = prenom + " " + nom;
 
-        // Hash du mot de passe (dans une vraie app, utilisez BCrypt)
-        // Pour l'instant, on stocke en clair pour les tests
-
-        String sql = "INSERT INTO UTILISATEUR (nom, telephone, adresse, role, mot_de_passe) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = Database.connectDB();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, nomComplet);          // nom (prénom + nom)
-            pstmt.setString(2, telephone);           // telephone
-            pstmt.setString(3, adresse);             // adresse
-            pstmt.setString(4, role);                // role
-            pstmt.setString(5, motDePasse);          // mot_de_passe (À HASHER en production)
-
-            int rowsAffected = pstmt.executeUpdate();
-            System.out.println("Utilisateur inséré avec succès: " + nomComplet);
-            return rowsAffected > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Erreur BD", "Erreur lors de l'insertion: " + e.getMessage());
-            return false;
-        }
-    }
 
     @FXML
     private void fermerPopup() {

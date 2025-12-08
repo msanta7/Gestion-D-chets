@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="mainAnchore" prefHeight="608.0" prefWidth="900.0" style="-fx-background-color: rgb(0, 102, 102);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.LoginController">
+<AnchorPane fx:id="mainAnchore" prefHeight="608.0" prefWidth="900.0" style="-fx-background-color: rgb(0, 102, 102);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.LoginController">
 
     <!-- Panneau droit (Formulaire) -->
     <AnchorPane layoutX="420.0" layoutY="-2.0" prefHeight="614.0" prefWidth="438.0" style="-fx-background-color: rgba(255, 255, 255, 0.95); -fx-background-radius: 0 20 20 0;" AnchorPane.bottomAnchor="-4.0" AnchorPane.rightAnchor="-6.0" AnchorPane.topAnchor="-2.0">
@@ -88,6 +88,16 @@
         </PasswordField>
 
         <Button fx:id="loginButton" layoutX="51.0" layoutY="380.0" onAction="#handleLogin" prefHeight="40" prefWidth="120" style="-fx-background-color: #006666; -fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-font-weight: normal; -fx-background-radius: 0; -fx-border-color: transparent; -fx-border-width: 0; -fx-padding: 10px 0px; -fx-cursor: hand;" text="Se Connecter" textFill="WHITE" />
+      <Label alignment="CENTER" layoutX="-8.0" layoutY="430.0" prefHeight="55.0" prefWidth="415.0" text="Vous n'avez pas de compte ? ">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Button alignment="CENTER_RIGHT" layoutX="280.0" layoutY="442.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="97.0" style="-fx-background-color: transparent; -fx-background-insets: 0;" text="Créez-en un." textFill="#006666">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
 
 
     </AnchorPane>

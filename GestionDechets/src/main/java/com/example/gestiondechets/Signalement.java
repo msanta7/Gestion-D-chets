@@ -5,6 +5,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.time.LocalDateTime;
+
 public class Signalement {
     private final IntegerProperty id = new SimpleIntegerProperty();
     private final StringProperty date = new SimpleStringProperty();
@@ -14,7 +16,7 @@ public class Signalement {
 
     public Signalement(int id, String date, String adresse, String description, String statut) {
         setId(id);
-        setDate(date);
+        setDate(date.toString());
         setAdresse(adresse);
         setDescription(description);
         setStatut(statut);
@@ -40,4 +42,6 @@ public class Signalement {
     public String getStatut() { return statut.get(); }
     public void setStatut(String value) { statut.set(value); }
     public StringProperty statutProperty() { return statut; }
+
+
 }

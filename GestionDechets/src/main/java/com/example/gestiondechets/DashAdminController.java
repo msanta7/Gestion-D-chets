@@ -1,5 +1,10 @@
 package com.example.gestiondechets;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,29 +13,34 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.List;
 
 public class DashAdminController {
 
     // CORRECTION : Utiliser userNameLabel1 au lieu de userNameLabel
-    @FXML private Label userNameLabel1;  // Changé de userNameLabel à userNameLabel1
+    @FXML private Label userNameLabel;  // Changé de userNameLabel à userNameLabel1
 
     @FXML private Label signalementsCount, collectesCount, usersCount, recyclingCount;
-    @FXML private Label signalementsLabel, collectesLabel, usersLabel, recyclingLabel;
 
     @FXML private AnchorPane dashboardView, usersView, settingsView;
-    @FXML private TableView<?> recentSignalementsTable;
+    @FXML private TableView<Signalement> recentSignalementsTable;
 
     // Boutons de navigation
-    @FXML private Button dashboard, signalementsBtn, usersBtn, reportsBtn, settingsBtn;
+    @FXML private Button dashboard, usersBtn, reportsBtn, settingsBtn;
 
     // Paramètres
     @FXML private ComboBox<String> languageCombo;
-
+    @FXML private TableColumn<Signalement, Number> colId;
+    @FXML private TableColumn<Signalement, String> colAdresse;
+    @FXML private TableColumn<Signalement, String> colDescription;
+    @FXML private TableColumn<Signalement, String> colEtat;
+    @FXML private TableColumn<Signalement, String> colDate;
     @FXML
     public void initialize() {
         // CORRECTION : Utiliser userNameLabel1
-        if (userNameLabel1 != null) {
-            userNameLabel1.setText("Admin : Administrateur");
+        if (userNameLabel != null) {
+            userNameLabel.setText(Database.getActiveUser().getNom());
+            System.out.println(Database.getUserName(Database.getActiveUser().getNom()));
         }
 
         // Initialiser les statistiques
@@ -43,18 +53,28 @@ public class DashAdminController {
         if (languageCombo != null) {
             languageCombo.getSelectionModel().select("Français");
         }
+        colId.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getId()));
+        colAdresse.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAdresse()));
+        colDescription.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDescription()));
+        colEtat.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatut()));
+        colDate.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getDate()));
+
+        loadThisWeekSignalements();
+    }
+
+    private void loadThisWeekSignalements() {
+        List<Signalement> list = Database.getSignalementsThisWeek();
+        ObservableList<Signalement> obs = FXCollections.observableArrayList(list);
+        recentSignalementsTable.setItems(obs);
+        System.out.println(obs);
     }
 
     private void updateStats() {
-        if (signalementsCount != null) signalementsCount.setText("157");
-        if (collectesCount != null) collectesCount.setText("89");
-        if (usersCount != null) usersCount.setText("42");
+        if (signalementsCount != null) signalementsCount.setText(String.valueOf(Database.countPendingSignalements()));
+        if (collectesCount != null) collectesCount.setText(String.valueOf(Database.getnumberof("collecte")));
+        if (usersCount != null) usersCount.setText(String.valueOf(Database.getnumberof("utilisateur")));
         if (recyclingCount != null) recyclingCount.setText("67%");
 
-        if (signalementsLabel != null) signalementsLabel.setText("Aujourd'hui: 12");
-        if (collectesLabel != null) collectesLabel.setText("Aujourd'hui: 8");
-        if (usersLabel != null) usersLabel.setText("Actifs: 38");
-        if (recyclingLabel != null) recyclingLabel.setText("Mois en cours");
     }
 
     // Méthodes pour afficher les différentes vues
@@ -70,7 +90,7 @@ public class DashAdminController {
 
     private void updateActiveButton(Button activeButton) {
         // Réinitialiser tous les styles
-        Button[] buttons = {dashboard, signalementsBtn, usersBtn, reportsBtn, settingsBtn};
+        Button[] buttons = {dashboard, usersBtn, reportsBtn, settingsBtn};
         for (Button btn : buttons) {
             if (btn != null) {
                 btn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;");
@@ -93,6 +113,7 @@ public class DashAdminController {
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 chargerPage("/com/example/gestiondechets/login.fxml");
+                Database.logoutUserByPhone(Database.getActiveUser().getTelephone());
             }
         });
     }
@@ -104,17 +125,8 @@ public class DashAdminController {
         alert.setHeaderText(null);
         alert.setContentText("Fonctionnalité d'ajout d'utilisateur à implémenter.");
         alert.showAndWait();
-    }
 
-    @FXML
-    private void filterUsers() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Filtre");
-        alert.setHeaderText(null);
-        alert.setContentText("Fonctionnalité de filtrage à implémenter.");
-        alert.showAndWait();
     }
-
     @FXML
     private void saveSettings() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -145,7 +157,7 @@ public class DashAdminController {
                 stage = (Stage) recentSignalementsTable.getScene().getWindow();
             } else {
                 // Utiliser n'importe quel élément non null
-                stage = (Stage) userNameLabel1.getScene().getWindow();
+                stage = (Stage) userNameLabel.getScene().getWindow();
             }
 
             Scene scene = new Scene(nouvellePage);

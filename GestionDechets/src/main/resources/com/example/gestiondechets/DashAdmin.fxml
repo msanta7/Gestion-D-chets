@@ -14,21 +14,13 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 
-<AnchorPane fx:id="adminRoot" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.DashAdminController">
+<AnchorPane fx:id="adminRoot" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.DashAdminController">
 
     <!-- Menu latéral -->
     <AnchorPane prefHeight="700.0" prefWidth="250" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0.0">
 
         <!-- Utilisateurs -->
-        <Button fx:id="usersBtn" layoutY="235.0" onAction="#showUsers" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="235.0">
-            <padding>
-                <Insets left="20" />
-            </padding>
-            <contentDisplay>LEFT</contentDisplay>
-        </Button>
-
-        <!-- Signalements -->
-        <Button fx:id="signalementsBtn" layoutY="167.0" onAction="#showSignalements" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Signalements" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="167.0">
+        <Button fx:id="usersBtn" layoutY="147.0" onAction="#showUsers" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Gestion des utilisateurs" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="147.0">
             <padding>
                 <Insets left="20" />
             </padding>
@@ -36,7 +28,7 @@
         </Button>
 
         <!-- Rapports -->
-        <Button fx:id="reportsBtn" layoutY="303.0" onAction="#showReports" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Rapports" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="303.0">
+        <Button fx:id="reportsBtn" layoutY="197.0" onAction="#showReports" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Rapports" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="197.0">
             <padding>
                 <Insets left="20" />
             </padding>
@@ -44,7 +36,7 @@
         </Button>
 
         <!-- Paramètres -->
-        <Button fx:id="settingsBtn" layoutY="375.0" onAction="#showSettings" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Paramétres" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="375.0">
+        <Button fx:id="settingsBtn" layoutY="247.0" onAction="#showSettings" prefHeight="50" prefWidth="250" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Paramétres" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="247.0">
             <padding>
                 <Insets left="20" />
             </padding>
@@ -54,12 +46,13 @@
         <!-- Copyright -->
         <Label alignment="CENTER" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;" text="© 2025 Gestion de Déchets" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
       <Button layoutX="64.0" layoutY="596.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-radius: 5; -fx-border-color: white;" text="Déconnexion" />
-      <Label fx:id="userNameLabel" layoutX="45.0" layoutY="27.0" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Admin : Administrateur" />
+      <Label layoutX="45.0" layoutY="27.0" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Admin :" />
       <Button fx:id="dashboard" contentDisplay="LEFT" layoutY="97.0" prefHeight="50" prefWidth="252.0" style="-fx-background-color: #34495e; -fx-border-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-cursor: hand;" text="Acceuil">
          <padding>
             <Insets left="20" />
          </padding>
       </Button>
+      <Label fx:id="userNameLabel" layoutX="117.0" layoutY="27.0" style="-fx-text-fill: white; -fx-font-size: 14px;" text="name" />
 
     </AnchorPane>
 
@@ -74,7 +67,6 @@
                 <Circle fill="#3498db" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
                 <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Signalements" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
                 <Label fx:id="signalementsCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
-                <Label fx:id="signalementsLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Aujourd'hui: 0" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
             </AnchorPane>
 
             <!-- Carte Collectes -->
@@ -82,7 +74,6 @@
                 <Circle fill="#2ecc71" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
                 <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Collectes" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
                 <Label fx:id="collectesCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
-                <Label fx:id="collectesLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Aujourd'hui: 0" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
             </AnchorPane>
 
             <!-- Carte Utilisateurs -->
@@ -90,7 +81,6 @@
                 <Circle fill="#e74c3c" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
                 <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Utilisateurs" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
                 <Label fx:id="usersCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
-                <Label fx:id="usersLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Actifs: 0" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
             </AnchorPane>
 
             <!-- Carte Recyclage -->
@@ -98,7 +88,6 @@
                 <Circle fill="#f39c12" radius="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="30" />
                 <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Déchets recyclés" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="30" />
                 <Label fx:id="recyclingCount" style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;" text="0" AnchorPane.leftAnchor="60" AnchorPane.topAnchor="50" />
-                <Label fx:id="recyclingLabel" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px;" text="Mois en cours" AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="20" />
             </AnchorPane>
 
             <!-- Tableau Signalements récents -->
@@ -107,11 +96,11 @@
 
                 <TableView fx:id="recentSignalementsTable" AnchorPane.bottomAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="60">
                     <columns>
-                        <TableColumn prefWidth="50" text="ID" />
-                        <TableColumn prefWidth="100" text="Date" />
-                        <TableColumn prefWidth="100" text="Type" />
-                        <TableColumn prefWidth="150" text="Localisation" />
-                        <TableColumn prefWidth="80" text="État" />
+                        <TableColumn fx:id="colId" prefWidth="50" text="ID" />
+                        <TableColumn fx:id="colDate" prefWidth="126.0" text="Date" />
+                        <TableColumn fx:id="colAdresse" prefWidth="124.0" text="Localisation" />
+                        <TableColumn fx:id="colEtat" prefWidth="128.0" text="État" />
+                  <TableColumn fx:id="colDescription" prefWidth="441.0" text="description" />
                     </columns>
                 </TableView>
             </AnchorPane>
@@ -151,7 +140,6 @@
                 </items>
             </ComboBox>
 
-            <Button fx:id="filterBtn" onAction="#filterUsers" prefHeight="35" prefWidth="80" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="Filtrer" AnchorPane.leftAnchor="520" AnchorPane.topAnchor="70" />
 
             <!-- Tableau utilisateurs -->
             <TableView fx:id="usersTable" AnchorPane.bottomAnchor="70" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="120">

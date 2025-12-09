@@ -70,58 +70,30 @@
                         </cellValueFactory>
                     </TableColumn>
 
-                    <!-- ID Intervention -->
-                    <TableColumn fx:id="idInterventionColonne" prefWidth="100" text="ID Intervention">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="idIntervention" />
-                        </cellValueFactory>
-                    </TableColumn>
-
-                    <!-- Adresse -->
-                    <TableColumn fx:id="adresseColonne" prefWidth="200" text="Adresse">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="idIntervention" />
-                        </cellValueFactory>
-                    </TableColumn>
-
                     <!-- Date Collecte -->
-                    <TableColumn fx:id="dateColonne" prefWidth="150" text="Date Collecte">
+                    <TableColumn fx:id="dateColonne" prefWidth="158.0" text="Date Collecte">
                         <cellValueFactory>
                             <PropertyValueFactory property="dateCollecte" />
                         </cellValueFactory>
                     </TableColumn>
 
                     <!-- Quantité -->
-                    <TableColumn fx:id="quantiteColonne" prefWidth="120" text="Quantité (kg)">
+                    <TableColumn fx:id="quantiteColonne" prefWidth="114.0" text="Quantité (kg)">
                         <cellValueFactory>
                             <PropertyValueFactory property="quantiteCollectee" />
                         </cellValueFactory>
                     </TableColumn>
 
                     <!-- Statut -->
-                    <TableColumn fx:id="statutColonne" prefWidth="100" text="Statut">
+                    <TableColumn fx:id="statutColonne" prefWidth="176.0" text="Statut">
                         <cellValueFactory>
                             <PropertyValueFactory property="idIntervention" />
-                        </cellValueFactory>
-                    </TableColumn>
-
-                    <!-- Agent -->
-                    <TableColumn fx:id="agentColonne" prefWidth="120" text="Agent">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="idAgentCollecteur" />
                         </cellValueFactory>
                     </TableColumn>
                 </columns>
             </TableView>
 
-            <!-- Boutons d'action en bas -->
-            <Button fx:id="voirDetailsBtn" disable="true" layoutX="20.0" layoutY="533.0" onAction="#voirDetailsCollecte" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Voir Détails" AnchorPane.bottomAnchor="23.0" AnchorPane.leftAnchor="20.0">
-                <tooltip>
-                    <Tooltip text="Voir les détails de la collecte sélectionnée" />
-                </tooltip>
-            </Button>
-
-            <Button fx:id="supprimerBtn" disable="true" layoutX="181.0" layoutY="533.0" onAction="#supprimerCollecte" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Supprimer" AnchorPane.bottomAnchor="23.0" AnchorPane.leftAnchor="181.0">
+            <Button fx:id="supprimerBtn" disable="true" layoutX="27.0" layoutY="538.0" onAction="#supprimerCollecte" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Supprimer" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="27.0">
                 <tooltip>
                     <Tooltip text="Supprimer la collecte sélectionnée" />
                 </tooltip>

@@ -9,15 +9,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
@@ -26,255 +23,421 @@ public class HistoriqueCollectesController implements Initializable {
 
     @FXML private Label nomAgentCollecteurLabel;
     @FXML private Label messageLabel;
-
-
     @FXML private TableView<Collecte> collectesTableView;
     @FXML private TableColumn<Collecte, Integer> idColonne;
-    @FXML private TableColumn<Collecte, Integer> idInterventionColonne;
-    @FXML private TableColumn<Collecte, String> adresseColonne;
     @FXML private TableColumn<Collecte, String> dateColonne;
     @FXML private TableColumn<Collecte, Double> quantiteColonne;
     @FXML private TableColumn<Collecte, String> statutColonne;
-    @FXML private TableColumn<Collecte, String> agentColonne;
 
     @FXML private Button voirDetailsBtn;
     @FXML private Button supprimerBtn;
 
     private ObservableList<Collecte> collectesList = FXCollections.observableArrayList();
-    private FilteredList<Collecte> filteredData;
+    private int currentAgentId = 2; // ID par défaut
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialiser les colonnes
-        initializeTableColumns();
+        System.out.println("=== INITIALISATION HISTORIQUE COLLECTES ===");
+
+        // Vérifier que tous les éléments FXML sont injectés
+        verifyFXMLElements();
+
+        // Configurer les colonnes de la table
+        setupTableColumns();
 
         // Charger les données
         loadCollectesData();
 
+        // Configurer les boutons
+        setupButtons();
 
-        // Gérer la sélection dans le tableau
-        setupSelectionListener();
-
-        // Initialiser le label de l'agent
-        nomAgentCollecteurLabel.setText("Agent Collecteur #2");
+        System.out.println("=== INITIALISATION TERMINÉE ===");
     }
 
-    private void initializeTableColumns() {
+    private void verifyFXMLElements() {
+        System.out.println("Vérification des éléments FXML:");
+        System.out.println("TableView: " + (collectesTableView != null ? "✓" : "✗ NULL"));
+        System.out.println("idColonne: " + (idColonne != null ? "✓" : "✗ NULL"));
+        System.out.println("dateColonne: " + (dateColonne != null ? "✓" : "✗ NULL"));
+        System.out.println("quantiteColonne: " + (quantiteColonne != null ? "✓" : "✗ NULL"));
+        System.out.println("statutColonne: " + (statutColonne != null ? "✓" : "✗ NULL"));
+        System.out.println("messageLabel: " + (messageLabel != null ? "✓" : "✗ NULL"));
+
+        if (collectesTableView == null) {
+            System.out.println("ERREUR: La TableView est null ! Vérifiez les fx:id dans le FXML.");
+        }
+    }
+
+    private void setupTableColumns() {
+        System.out.println("Configuration des colonnes de la table...");
+
+        // 1. Colonne ID
         idColonne.setCellValueFactory(new PropertyValueFactory<>("idCollecte"));
-        idInterventionColonne.setCellValueFactory(new PropertyValueFactory<>("idIntervention"));
-
-        // Pour l'adresse, utilisez simplement l'ID intervention pour l'instant
-        adresseColonne.setCellValueFactory(cellData -> {
-            int idIntervention = cellData.getValue().getIdIntervention();
-            return new javafx.beans.property.SimpleStringProperty("Intervention #" + idIntervention);
-        });
-
-        // Colonne date formatée
-        dateColonne.setCellValueFactory(cellData -> {
-            LocalDateTime date = cellData.getValue().getDateCollecte();
-            if (date != null) {
-                String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-                return new javafx.beans.property.SimpleStringProperty(formattedDate);
+        idColonne.setCellFactory(column -> new TableCell<Collecte, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText("#" + item);
+                    setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
+                }
             }
-            return new javafx.beans.property.SimpleStringProperty("");
         });
 
+        // 2. Colonne Date
+        dateColonne.setCellValueFactory(cellData -> {
+            Collecte collecte = cellData.getValue();
+            if (collecte != null && collecte.getDateCollecte() != null) {
+                LocalDateTime date = collecte.getDateCollecte().toLocalDateTime();
+                String formatted = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+                return new javafx.beans.property.SimpleStringProperty(formatted);
+            }
+            return new javafx.beans.property.SimpleStringProperty("N/A");
+        });
+
+        // 3. Colonne Quantité
         quantiteColonne.setCellValueFactory(new PropertyValueFactory<>("quantiteCollectee"));
+        quantiteColonne.setCellFactory(column -> new TableCell<Collecte, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.1f kg", item));
+                    setStyle("-fx-alignment: CENTER;");
+                }
+            }
+        });
 
-        // Pour le statut, utilisez "Terminée" par défaut
-        statutColonne.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty("Terminée"));
+        // 4. Colonne Statut
+        statutColonne.setCellValueFactory(new PropertyValueFactory<>("statut"));
+        statutColonne.setCellFactory(column -> new TableCell<Collecte, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
 
-        // Pour l'agent collecteur
-        agentColonne.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty("Agent #" + cellData.getValue().getIdAgentCollecteur()));
+                    // Couleurs selon le statut
+                    switch(item.toLowerCase()) {
+                        case "terminée":
+                            setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                            break;
+                        case "en cours":
+                            setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                            break;
+                        case "planifiée":
+                            setStyle("-fx-text-fill: #3498db; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                            break;
+                        case "annulée":
+                            setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                            break;
+                        default:
+                            setStyle("-fx-text-fill: #7f8c8d; -fx-alignment: CENTER;");
+                    }
+                }
+            }
+        });
+
+        System.out.println("Colonnes configurées avec succès");
     }
 
     private void loadCollectesData() {
-        // Charger les données depuis la base de données
-        // Exemple avec des données fictives
+        System.out.println("Chargement des données...");
+
+        // Effacer la liste existante
         collectesList.clear();
 
-        // Créer des objets Collecte selon votre classe existante
-        Collecte collecte1 = new Collecte();
-        collecte1.setIdCollecte(1);
-        collecte1.setIdIntervention(101);
-        collecte1.setDateCollecte(LocalDateTime.now().minusDays(2));
-        collecte1.setQuantiteCollectee(150.5);
-        collecte1.setIdAgentCollecteur(2);
+        // Essayer de charger depuis la base de données
+        boolean loadedFromDB = loadFromDatabase();
 
-        Collecte collecte2 = new Collecte();
-        collecte2.setIdCollecte(2);
-        collecte2.setIdIntervention(102);
-        collecte2.setDateCollecte(LocalDateTime.now().minusDays(1));
-        collecte2.setQuantiteCollectee(200.0);
-        collecte2.setIdAgentCollecteur(2);
+        // Si échec, charger des données de test
+        if (!loadedFromDB) {
+            loadTestData();
+        }
 
-        Collecte collecte3 = new Collecte();
-        collecte3.setIdCollecte(3);
-        collecte3.setIdIntervention(103);
-        collecte3.setDateCollecte(LocalDateTime.now());
-        collecte3.setQuantiteCollectee(175.3);
-        collecte3.setIdAgentCollecteur(2);
+        // Assigner la liste à la TableView
+        collectesTableView.setItems(collectesList);
 
-        collectesList.addAll(collecte1, collecte2, collecte3);
+        // Mettre à jour le message
+        updateMessage();
 
-        filteredData = new FilteredList<>(collectesList, p -> true);
-        SortedList<Collecte> sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(collectesTableView.comparatorProperty());
-        collectesTableView.setItems(sortedData);
+        System.out.println("Données chargées: " + collectesList.size() + " collectes");
     }
 
+    private boolean loadFromDatabase() {
+        System.out.println("Tentative de chargement depuis la base de données...");
 
-    private void setupSelectionListener() {
+        try (Connection conn = Database.connectDB()) {
+            if (conn == null) {
+                System.out.println("❌ Connexion DB échouée");
+                return false;
+            }
+
+            String query = """
+                SELECT 
+                    c.id_collecte,
+                    c.date_collecte,
+                    c.quantite_collectee,
+                    c.id_intervention,
+                    COALESCE(i.statut, 'inconnu') as statut
+                FROM COLLECTE c
+                LEFT JOIN INTERVENTION i ON c.id_intervention = i.id_intervention
+                WHERE c.id_agent_collecteur = ?
+                ORDER BY c.date_collecte DESC
+            """;
+
+            try (PreparedStatement pst = conn.prepareStatement(query)) {
+                pst.setInt(1, currentAgentId);
+
+                try (ResultSet rs = pst.executeQuery()) {
+                    int count = 0;
+                    while (rs.next()) {
+                        Collecte collecte = new Collecte();
+                        collecte.setIdCollecte(rs.getInt("id_collecte"));
+                        collecte.setDateCollecte(rs.getTimestamp("date_collecte"));
+                        collecte.setQuantiteCollectee(rs.getDouble("quantite_collectee"));
+                        collecte.setIdIntervention(rs.getInt("id_intervention"));
+                        collecte.setStatut(formatStatut(rs.getString("statut")));
+
+                        collectesList.add(collecte);
+                        count++;
+                    }
+
+                    System.out.println("✅ " + count + " collectes chargées depuis la DB");
+                    return count > 0;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur SQL: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void loadTestData() {
+        System.out.println("Chargement des données de test...");
+
+        // Créer des données de test
+        for (int i = 1; i <= 5; i++) {
+            Collecte collecte = new Collecte();
+            collecte.setIdCollecte(i);
+            collecte.setDateCollecte(Timestamp.valueOf(LocalDateTime.now().minusDays(i)));
+            collecte.setQuantiteCollectee(25.5 * i);
+            collecte.setIdIntervention(100 + i);
+
+            switch (i % 4) {
+                case 0: collecte.setStatut("Terminée"); break;
+                case 1: collecte.setStatut("En Cours"); break;
+                case 2: collecte.setStatut("Planifiée"); break;
+                case 3: collecte.setStatut("Annulée"); break;
+            }
+
+            collectesList.add(collecte);
+        }
+
+        System.out.println("✅ Données de test chargées");
+    }
+
+    private String formatStatut(String statutDB) {
+        if (statutDB == null) return "Inconnu";
+
+        switch (statutDB.toLowerCase()) {
+            case "terminee": return "Terminée";
+            case "en_cours": return "En Cours";
+            case "planifiee": return "Planifiée";
+            case "annulee": return "Annulée";
+            default: return statutDB;
+        }
+    }
+
+    private void updateMessage() {
+        if (messageLabel == null) return;
+
+        int count = collectesList.size();
+        if (count == 0) {
+            messageLabel.setText("Aucune collecte trouvée");
+            messageLabel.setStyle("-fx-text-fill: #f39c12;");
+        } else {
+            messageLabel.setText(count + " collecte(s) affichée(s)");
+            messageLabel.setStyle("-fx-text-fill: #2ecc71;");
+        }
+    }
+
+    private void setupButtons() {
+        // Désactiver les boutons par défaut
+        if (voirDetailsBtn != null) voirDetailsBtn.setDisable(true);
+        if (supprimerBtn != null) supprimerBtn.setDisable(true);
+
+        // Gérer la sélection dans le tableau
         collectesTableView.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    boolean itemSelected = newValue != null;
-                    voirDetailsBtn.setDisable(!itemSelected);
-                    supprimerBtn.setDisable(!itemSelected);
+                (obs, oldSelection, newSelection) -> {
+                    boolean hasSelection = newSelection != null;
+                    if (voirDetailsBtn != null) voirDetailsBtn.setDisable(!hasSelection);
+                    if (supprimerBtn != null) supprimerBtn.setDisable(!hasSelection);
                 }
         );
     }
 
+    // ========== ACTIONS DES BOUTONS ==========
+
     @FXML
-    private void ouvrirPopupNouvelleCollecte() {
+    private void handleNouvelleCollecte() {
         try {
-            // Charger le formulaire de nouvelle collecte
             FXMLLoader loader = new FXMLLoader(getClass().getResource("effectuer-collecte.fxml"));
             Parent root = loader.load();
 
-            // Obtenir le contrôleur de la popup
-            EffectuerCollecteController popupController = loader.getController();
+            Stage popup = new Stage();
+            popup.setTitle("Nouvelle Collecte");
+            popup.initModality(Modality.APPLICATION_MODAL);
+            popup.setScene(new Scene(root));
 
-            // Configurer un callback pour rafraîchir le tableau après ajout
-            popupController.setOnCollecteAjoutee(() -> {
-                rafraichirTableau();
+            popup.setOnHidden(e -> {
+                // Recharger les données après fermeture
+                loadCollectesData();
             });
 
-            // Créer une nouvelle scène pour la popup
-            Scene scene = new Scene(root);
-            Stage popupStage = new Stage();
-            popupStage.setTitle("Nouvelle Collecte");
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(nomAgentCollecteurLabel.getScene().getWindow());
-            popupStage.setScene(scene);
-            popupStage.setResizable(false);
-
-            // Afficher la popup
-            popupStage.showAndWait();
+            popup.showAndWait();
 
         } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible d'ouvrir le formulaire de collecte", Alert.AlertType.ERROR);
-        }
-    }
-
-    private void rafraichirTableau() {
-        // Rafraîchir les données du tableau
-        collectesTableView.getItems().clear();
-        loadCollectesData();
-        messageLabel.setText("Nouvelle collecte ajoutée avec succès !");
-        messageLabel.setStyle("-fx-text-fill: #2ecc71;");
-    }
-
-
-    @FXML
-    private void voirDetailsCollecte() {
-        Collecte selected = collectesTableView.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String dateFormatted = selected.getDateCollecte() != null ?
-                    selected.getDateCollecte().format(formatter) : "N/A";
-
-            // Afficher les détails
-            showAlert("Détails",
-                    String.format("ID: %d\nIntervention: %d\nDate: %s\nQuantité: %.1f kg\nAgent: %d",
-                            selected.getIdCollecte(),
-                            selected.getIdIntervention(),
-                            dateFormatted,
-                            selected.getQuantiteCollectee(),
-                            selected.getIdAgentCollecteur()),
-                    Alert.AlertType.INFORMATION);
+            showAlert("Erreur", "Impossible d'ouvrir le formulaire", Alert.AlertType.ERROR);
         }
     }
 
     @FXML
-    private void supprimerCollecte() {
+    private void handleVoirDetails() {
         Collecte selected = collectesTableView.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation de suppression");
-            alert.setHeaderText("Supprimer la collecte #" + selected.getIdCollecte());
-            alert.setContentText("Êtes-vous sûr de vouloir supprimer cette collecte ? Cette action est irréversible.");
+        if (selected == null) {
+            showAlert("Aucune sélection", "Veuillez sélectionner une collecte", Alert.AlertType.WARNING);
+            return;
+        }
 
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                // Ici, supprimer de la base de données
-                // collecteDAO.delete(selected.getIdCollecte());
+        // Créer une boîte de dialogue de détails
+        Alert detailsDialog = new Alert(Alert.AlertType.INFORMATION);
+        detailsDialog.setTitle("Détails de la collecte");
+        detailsDialog.setHeaderText("Collecte #" + selected.getIdCollecte());
 
-                collectesList.remove(selected);
-                messageLabel.setText("Collecte #" + selected.getIdCollecte() + " supprimée avec succès");
-                messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+        StringBuilder content = new StringBuilder();
+        content.append("ID Collecte: ").append(selected.getIdCollecte()).append("\n");
+
+        if (selected.getDateCollecte() != null) {
+            LocalDateTime date = selected.getDateCollecte().toLocalDateTime();
+            content.append("Date: ").append(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm"))).append("\n");
+        }
+
+        content.append("Quantité: ").append(String.format("%.1f kg", selected.getQuantiteCollectee())).append("\n");
+        content.append("Statut: ").append(selected.getStatut()).append("\n");
+        content.append("ID Intervention: ").append(selected.getIdIntervention());
+
+        detailsDialog.setContentText(content.toString());
+        detailsDialog.showAndWait();
+    }
+
+    @FXML
+    private void handleSupprimer() {
+        Collecte selected = collectesTableView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        // Confirmation
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmer la suppression");
+        confirm.setHeaderText("Supprimer la collecte #" + selected.getIdCollecte());
+        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette collecte ?");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // Supprimer de la base de données
+                    boolean deleted = deleteFromDatabase(selected.getIdCollecte());
+
+                    if (deleted) {
+                        // Supprimer de la liste
+                        collectesList.remove(selected);
+                        collectesTableView.refresh();
+                        updateMessage();
+
+                        showAlert("Succès", "Collecte supprimée avec succès", Alert.AlertType.INFORMATION);
+                    } else {
+                        showAlert("Erreur", "Échec de la suppression", Alert.AlertType.ERROR);
+                    }
+
+                } catch (Exception e) {
+                    showAlert("Erreur", "Erreur: " + e.getMessage(), Alert.AlertType.ERROR);
+                }
             }
+        });
+    }
+
+    private boolean deleteFromDatabase(int idCollecte) {
+        try (Connection conn = Database.connectDB()) {
+            if (conn == null) return false;
+
+            String query = "DELETE FROM COLLECTE WHERE id_collecte = ?";
+            try (PreparedStatement pst = conn.prepareStatement(query)) {
+                pst.setInt(1, idCollecte);
+                int rows = pst.executeUpdate();
+                return rows > 0;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erreur suppression: " + e.getMessage());
+            return false;
         }
     }
 
     @FXML
-    private void retourDashboard() {
+    private void handleRetour() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("dashConducteur.fxml"));
-            Parent root = loader.load();
             Stage stage = (Stage) nomAgentCollecteurLabel.getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("DashConducteur.fxml"));
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Erreur", "Impossible de retourner au dashboard", Alert.AlertType.ERROR);
         }
-    }
-
-    @FXML
-    private void effectuerNouvelleCollecte() {
-        // Cette méthode n'est plus utilisée si vous avez la popup
-        // Vous pouvez la supprimer ou la garder comme alternative
-        ouvrirPopupNouvelleCollecte();
-    }
-
-    @FXML
-    private void historiqueCollectes() {
-        // Déjà sur cette page
-        messageLabel.setText("Vous êtes déjà sur la page historique");
-        messageLabel.setStyle("-fx-text-fill: #f39c12;");
     }
 
     @FXML
     private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Déconnexion");
-        alert.setHeaderText("Se déconnecter");
-        alert.setContentText("Êtes-vous sûr de vouloir vous déconnecter ?");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Déconnexion");
+        confirm.setHeaderText("Se déconnecter");
+        confirm.setContentText("Voulez-vous vraiment vous déconnecter ?");
 
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
-                Parent root = loader.load();
-                Stage stage = (Stage) nomAgentCollecteurLabel.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.show();
-            } catch (IOException e) {
-                e.printStackTrace();
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    Stage stage = (Stage) nomAgentCollecteurLabel.getScene().getWindow();
+                    Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+                    stage.setScene(new Scene(root));
+                    stage.show();
+                } catch (IOException e) {
+                    showAlert("Erreur", "Impossible de charger la page de connexion", Alert.AlertType.ERROR);
+                }
             }
-        }
+        });
     }
 
-    private void showAlert(String title, String content, Alert.AlertType type) {
+    @FXML
+    private void handleRefresh() {
+        System.out.println("Rafraîchissement des données...");
+        loadCollectesData();
+    }
+
+    // ========== MÉTHODES UTILITAIRES ==========
+
+    private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(content);
+        alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    // Interface pour le callback de rafraîchissement
-    public interface CollecteAjouteeCallback {
-        void onCollecteAjoutee();
     }
 }

@@ -9,15 +9,16 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class PopupSignalementController {
 
-    // SEULEMENT LES ÉLÉMENTS QUI EXISTENT DANS VOTRE FXML
+    // Éléments FXML
     @FXML private TextField adresseField;
     @FXML private TextArea descriptionArea;
     @FXML private ImageView previewImageView;
     @FXML private Label photoLabel;
-    @FXML private TextField latitudeField, longitudeField;
     @FXML private Button btnValider, btnChoisirPhoto, btnSupprimerPhoto;
 
     // RadioButtons
@@ -25,6 +26,17 @@ public class PopupSignalementController {
 
     private File photoFile;
     private Stage stage;
+    private int citoyenId;
+    private Runnable onSignalementAdded;
+
+    // Add these missing methods
+    public void setCitoyenId(int citoyenId) {
+        this.citoyenId = citoyenId;
+    }
+
+    public void setOnSignalementAdded(Runnable onSignalementAdded) {
+        this.onSignalementAdded = onSignalementAdded;
+    }
 
     @FXML
     public void initialize() {
@@ -121,25 +133,11 @@ public class PopupSignalementController {
     }
 
     @FXML
-    private void utiliserLocalisationActuelle() {
-        // Simuler la géolocalisation
-        if (latitudeField != null) latitudeField.setText("33.5731");
-        if (longitudeField != null) longitudeField.setText("-7.5898");
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Localisation");
-        alert.setHeaderText(null);
-        alert.setContentText("Localisation actuelle récupérée.");
-        alert.showAndWait();
-    }
-
-    @FXML
     private void validerSignalement() {
         // Récupérer les données
         String adresse = (adresseField != null) ? adresseField.getText().trim() : "";
         String description = (descriptionArea != null) ? descriptionArea.getText().trim() : "";
-        String latitude = (latitudeField != null) ? latitudeField.getText() : "";
-        String longitude = (longitudeField != null) ? longitudeField.getText() : "";
+
 
         // Déterminer le niveau d'urgence
         String urgence = "MOYEN"; // Par défaut
@@ -153,26 +151,47 @@ public class PopupSignalementController {
             return;
         }
 
-        // Simuler l'envoi des données
-        System.out.println("=== NOUVEAU SIGNALEMENT ===");
-        System.out.println("Adresse: " + adresse);
-        System.out.println("Description: " + description);
-        System.out.println("Localisation: " + latitude + ", " + longitude);
-        System.out.println("Urgence: " + urgence);
-        System.out.println("Photo: " + (photoFile != null ? photoFile.getName() : "Aucune"));
-        System.out.println("==========================");
+        // Insérer dans la base de données
+        try {
+            Connection conn = Database.connectDB();
+            if (conn != null) {
+                // Remove id_citoyen from the query
+                String query = "INSERT INTO SIGNALEMENT (adresse, description, etat) VALUES (?, ?, 'nouveau')";
+                PreparedStatement pst = conn.prepareStatement(query);
+                pst.setString(1, adresse);
+                pst.setString(2, description);
 
-        // Afficher confirmation
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Signalement envoyé");
-        alert.setHeaderText(null);
-        alert.setContentText("Votre signalement a été enregistré avec succès.\n\n" +
-                "Numéro de suivi: #" + (int)(Math.random() * 10000) + "\n" +
-                "Un agent traitera votre demande sous 48h.");
-        alert.showAndWait();
+                int rowsAffected = pst.executeUpdate();
 
-        // Fermer la fenêtre
-        fermerPopup();
+                if (rowsAffected > 0) {
+                    // Afficher confirmation
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Signalement envoyé");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Votre signalement a été enregistré avec succès.\n\n" +
+                            "Numéro de suivi: #" + (int)(Math.random() * 10000) + "\n" +
+                            "Un agent traitera votre demande sous 48h.");
+                    alert.showAndWait();
+
+                    // Notify the dashboard to refresh
+                    if (onSignalementAdded != null) {
+                        onSignalementAdded.run();
+                    }
+
+                    // Fermer la fenêtre
+                    fermerPopup();
+                }
+
+                conn.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("Erreur lors de l'enregistrement dans la base de données: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     @FXML

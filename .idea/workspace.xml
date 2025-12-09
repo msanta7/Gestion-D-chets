@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0e52ba47-051b-4417-8638-b426550381dc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/CollecteFX.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/ListeCollectesController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/TriDechetController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/TriDechet.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/triage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/DashTriController.java" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/DashTriController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/GenererRapportTriController.java" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/GenererRapportTriController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/RapportsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/RapportsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/SettingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/SettingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/TriageDechetsController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/DashTri.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/DashTri.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/generer-rapport-tri.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/generer-rapport-tri.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/triage-dechets.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/GestionDechets/src/main/resources/com/example/gestiondechets/triage-dechets.fxml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FxmlFile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="36RFII0iysqbACK6JaadnLBAhLo" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.HelloApplication.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "mehdi",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.splitter.proportion": "0.2609582"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\GL\Gestion-D-chets\GestionDechets\src\main\resources\com\example\gestiondechets" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example" />
+      <recent name="com.example.gestiondechets" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="HelloApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.gestiondechets.HelloApplication" />
+      <module name="GestionDechets" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.gestiondechets.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.HelloApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0e52ba47-051b-4417-8638-b426550381dc" name="Changes" comment="" />
+      <created>1764961396628</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1764961396628</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/GestionDechets/src/main/java/com/example/gestiondechets/RapportsController.java</url>
+          <line>238</line>
+          <properties class="com.example.gestiondechets.RapportsController" method="generateDechetsReport">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

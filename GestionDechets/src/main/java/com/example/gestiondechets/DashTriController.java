@@ -1,98 +1,193 @@
 package com.example.gestiondechets;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.beans.property.*;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 import javafx.event.ActionEvent;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DashTriController {
 
-    @FXML private TableView<Triage> historiqueTable;
-    @FXML private TableColumn<Triage, Integer> idTriageCol;
-    @FXML private TableColumn<Triage, String> dateTriageCol;
-    @FXML private TableColumn<Triage, String> typeDechetCol;
-    @FXML private TableColumn<Triage, Double> quantiteCol;
-    @FXML private TableColumn<Triage, String> statutTriageCol;
+    @FXML
+    private Label nomAgentLabel;
 
-    @FXML private Label nomAgentLabel;
+    @FXML
+    private TableView<HistoriqueDechet> historiqueTable;
 
-    private ObservableList<Triage> triagesList = FXCollections.observableArrayList();
+    @FXML
+    private TableColumn<HistoriqueDechet, Integer> idAgentCol; // Changed from String to Integer
+
+    @FXML
+    private TableColumn<HistoriqueDechet, Integer> idTriageCol; // Changed to Integer
+
+    @FXML
+    private TableColumn<HistoriqueDechet, String> typeDechetCol;
+
+    @FXML
+    private TableColumn<HistoriqueDechet, Double> quantiteCol; // Changed to Double
+
+    @FXML
+    private TableColumn<HistoriqueDechet, String> statutTriageCol;
+
+    @FXML
+    private TableColumn<HistoriqueDechet, String> dateTriageCol;
+
+    private Connection conn;
+    private ObservableList<HistoriqueDechet> historiqueData = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        // Configurer le nom de l'agent
-        nomAgentLabel.setText("Agent Tri");
+        System.out.println("DashTriController initialize() called"); // DEBUG
 
-        // Configurer les colonnes
-        idTriageCol.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
-        dateTriageCol.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-        typeDechetCol.setCellValueFactory(cellData -> cellData.getValue().typeDechetProperty());
-        quantiteCol.setCellValueFactory(cellData -> cellData.getValue().quantiteProperty().asObject());
-        statutTriageCol.setCellValueFactory(cellData -> cellData.getValue().statutProperty());
+        conn = Database.connectDB();
+        if (conn == null) {
+            System.out.println("ERROR: Database connection is null!"); // DEBUG
+            return;
+        }
 
-        // Personnaliser l'affichage du statut
-        statutTriageCol.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(String statut, boolean empty) {
-                super.updateItem(statut, empty);
+        // DEBUG: Check if table columns are injected
+        System.out.println("historiqueTable: " + historiqueTable);
+        System.out.println("idTriageCol: " + idTriageCol);
+        System.out.println("typeDechetCol: " + typeDechetCol);
+        System.out.println("quantiteCol: " + quantiteCol);
+        System.out.println("statutTriageCol: " + statutTriageCol);
+        System.out.println("dateTriageCol: " + dateTriageCol);
 
-                if (empty || statut == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(statut);
-                    setStyle(getStatutStyle(statut));
-                    setAlignment(javafx.geometry.Pos.CENTER);
-                }
-            }
+        // Set up table columns using PropertyValueFactory for simplicity
+        // Make sure these match the property names in HistoriqueDechet class
+        idAgentCol.setCellValueFactory(new PropertyValueFactory<>("idAgent"));
+        idTriageCol.setCellValueFactory(new PropertyValueFactory<>("idDechet"));
+        typeDechetCol.setCellValueFactory(new PropertyValueFactory<>("typeDechet"));
+        quantiteCol.setCellValueFactory(new PropertyValueFactory<>("quantite"));
+        statutTriageCol.setCellValueFactory(new PropertyValueFactory<>("toxicite"));
+        dateTriageCol.setCellValueFactory(new PropertyValueFactory<>("dateTriage"));
 
-            private String getStatutStyle(String statut) {
-                switch(statut.toLowerCase()) {
-                    case "en attente":
-                        return "-fx-background-color: #f39c12; -fx-background-radius: 10; -fx-text-fill: white; -fx-padding: 5 10; -fx-font-weight: bold;";
-                    case "en cours":
-                        return "-fx-background-color: #3498db; -fx-background-radius: 10; -fx-text-fill: white; -fx-padding: 5 10; -fx-font-weight: bold;";
-                    case "terminé":
-                        return "-fx-background-color: #2ecc71; -fx-background-radius: 10; -fx-text-fill: white; -fx-padding: 5 10; -fx-font-weight: bold;";
-                    case "stocké":
-                        return "-fx-background-color: #9b59b6; -fx-background-radius: 10; -fx-text-fill: white; -fx-padding: 5 10; -fx-font-weight: bold;";
-                    default:
-                        return "";
-                }
-            }
-        });
+        // Set agent name
+        if (Database.getActiveUser() != null) {
+            nomAgentLabel.setText(Database.getActiveUser().getNom());
+            System.out.println("Agent name set to: " + Database.getActiveUser().getNom()); // DEBUG
+        } else {
+            System.out.println("WARNING: No active user found!"); // DEBUG
+        }
 
-        // Charger les données
-        chargerDonneesTest();
+        // Load historical data
+        chargerHistorique30Jours();
     }
 
-    private void chargerDonneesTest() {
-        triagesList.clear();
+    private void chargerHistorique30Jours() {
+        System.out.println("chargerHistorique30Jours() called"); // DEBUG
+        historiqueData.clear();
 
-        // Données de test
-        triagesList.add(new Triage(3001, "03/12/2024 08:30", "Plastique", 125.5, "terminé"));
-        triagesList.add(new Triage(3002, "02/12/2024 14:15", "Verre", 89.2, "stocké"));
-        triagesList.add(new Triage(3003, "01/12/2024 10:45", "Métal", 156.8, "en cours"));
-        triagesList.add(new Triage(3004, "30/11/2024 16:20", "Carton", 75.3, "terminé"));
-        triagesList.add(new Triage(3005, "29/11/2024 09:10", "Organique", 210.7, "stocké"));
-        triagesList.add(new Triage(3006, "28/11/2024 11:30", "Plastique", 95.0, "en attente"));
-        triagesList.add(new Triage(3007, "27/11/2024 13:45", "Verre", 68.4, "terminé"));
+        // Calculate date 30 days ago
+        LocalDate dateLimite = LocalDate.now().minusDays(30);
+        String dateLimiteStr = dateLimite.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        System.out.println("Loading data from date: " + dateLimiteStr); // DEBUG
 
-        historiqueTable.setItems(triagesList);
+        String sql = """
+            SELECT 
+                d.id_dechet,
+                d.type_dechet,
+                d.quantite,
+                d.toxicite,
+                DATE_FORMAT(d.date_tri, '%d/%m/%Y %H:%i') as date_tri_formatted,
+                d.id_agent_tri
+            FROM DECHET d
+            WHERE d.date_tri >= ? AND d.date_tri IS NOT NULL
+            ORDER BY d.date_tri DESC
+            LIMIT 100
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, dateLimiteStr);
+            ResultSet rs = ps.executeQuery();
+
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                int idDechet = rs.getInt("id_dechet");
+                String typeDechet = rs.getString("type_dechet");
+                double quantite = rs.getDouble("quantite");
+                String toxicite = rs.getString("toxicite");
+                String dateTriage = rs.getString("date_tri_formatted");
+                int idAgent = rs.getInt("id_agent_tri");
+
+                System.out.println("Loaded row " + count + ": " +
+                        idDechet + ", " + typeDechet + ", " + quantite + "kg, " +
+                        toxicite + ", " + dateTriage); // DEBUG
+
+                historiqueData.add(new HistoriqueDechet(
+                        idAgent,
+                        idDechet,
+                        typeDechet,
+                        quantite,
+                        toxicite,
+                        dateTriage
+                ));
+            }
+
+            System.out.println("Total rows loaded: " + count); // DEBUG
+
+            historiqueTable.setItems(historiqueData);
+            System.out.println("Table items set, size: " + historiqueData.size()); // DEBUG
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("SQL Error: " + e.getMessage()); // DEBUG
+            showError("Erreur", "Impossible de charger l'historique: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("General Error: " + e.getMessage()); // DEBUG
+        }
     }
 
-    // === MÉTHODES DE NAVIGATION ===
+    // Model class for historique table
+    public static class HistoriqueDechet {
+        private final Integer idAgent;
+        private final Integer idDechet;
+        private final String typeDechet;
+        private final Double quantite;
+        private final String toxicite;
+        private final String dateTriage;
+
+        public HistoriqueDechet(int idAgent, int idDechet, String typeDechet,
+                                double quantite, String toxicite, String dateTriage) {
+            this.idAgent = idAgent;
+            this.idDechet = idDechet;
+            this.typeDechet = typeDechet;
+            this.quantite = quantite;
+            this.toxicite = toxicite;
+            this.dateTriage = dateTriage;
+        }
+
+        // Getters for PropertyValueFactory (must be exactly these names!)
+        public Integer getIdAgent() { return idAgent; }
+        public Integer getIdDechet() { return idDechet; }
+        public String getTypeDechet() { return typeDechet; }
+        public Double getQuantite() { return quantite; }
+        public String getToxicite() { return toxicite; }
+        public String getDateTriage() { return dateTriage; }
+    }
+
+    // Navigation methods (keep as before)
     @FXML
     private void showDashboard(ActionEvent event) {
-        // Déjà sur cette page
+        // Already on dashboard
     }
 
     @FXML
@@ -153,6 +248,8 @@ public class DashTriController {
                     e.printStackTrace();
                     showError("Erreur de déconnexion", "Impossible de charger la page de connexion");
                 }
+                Database.logoutUserByPhone(Database.getActiveUser().getTelephone());
+
             }
         });
     }
@@ -164,5 +261,4 @@ public class DashTriController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 }

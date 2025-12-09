@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane stylesheets="@triage.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.TriDechetController">
+
+    <!-- Top Navigation Bar -->
+    <top>
+        <HBox prefHeight="70" styleClass="top-nav">
+            <children>
+                <Label prefHeight="67.0" prefWidth="295.0" text="🌱 Tri des Déchets" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="26.0" />
+                    </font>
+                </Label>
+            </children>
+        </HBox>
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="25" styleClass="main-container">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" prefHeight="23.0" prefWidth="542.0" styleClass="section-header">
+                <Label fx:id="lblRestant" alignment="CENTER" prefHeight="37.0" prefWidth="229.0" styleClass="remaining-label" text="Quantité restante : 0 kg" />
+            </HBox>
+
+            <!-- Form Card -->
+            <GridPane hgap="15" prefHeight="281.0" prefWidth="542.0" styleClass="form-card" vgap="20">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" prefWidth="150.0" />
+                    <ColumnConstraints halignment="LEFT" prefWidth="300.0" />
+                    <ColumnConstraints />
+                </columnConstraints>
+                <ChoiceBox fx:id="cbTypeDechet" prefWidth="250" styleClass="form-choicebox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <!-- Type de déchet -->
+                <Label styleClass="form-label" text="Type de déchet *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                <!-- Catégorie -->
+                <Label styleClass="form-label" text="Catégorie *" GridPane.columnIndex="0" />
+                <ChoiceBox fx:id="cbCategorie" prefWidth="250" styleClass="form-choicebox" GridPane.columnIndex="1" />
+
+                <!-- Quantité -->
+                <Label styleClass="form-label" text="Quantité (kg) *" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <TextField fx:id="txtQuantite" prefWidth="150" promptText="0.00" styleClass="form-textfield" />
+                    <Label styleClass="unit-label" text="kg" />
+                </HBox>
+
+                <!-- Buttons -->
+                <HBox spacing="15" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                    <Button onAction="#ajouterDechet" prefWidth="150" styleClass="primary-btn" text="🗑️ Ajouter Déchet" />
+                    <Button onAction="#fermer" prefWidth="120" styleClass="secondary-btn" text="✕ Fermer" />
+                </HBox>
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
+
+            <!-- Quick Stats -->
+            <HBox spacing="20" styleClass="stats-container">
+                <VBox alignment="CENTER" styleClass="stat-card plastic">
+                    <Label styleClass="stat-icon" text="♻️" />
+                    <Label styleClass="stat-title" text="PLASTIQUE" />
+                    <Label fx:id="statPlastiqueValue" styleClass="stat-value" text="0 kg" />
+                </VBox>
+
+                <VBox alignment="CENTER" styleClass="stat-card glass">
+                    <Label styleClass="stat-icon" text="🥃" />
+                    <Label styleClass="stat-title" text="VERRE" />
+                    <Label fx:id="statVerreValue" styleClass="stat-value" text="0 kg" />
+                </VBox>
+
+                <VBox alignment="CENTER" styleClass="stat-card metal">
+                    <Label styleClass="stat-icon" text="🔩" />
+                    <Label styleClass="stat-title" text="MÉTAL" />
+                    <Label fx:id="statMetalValue" styleClass="stat-value" text="0 kg" />
+                </VBox>
+
+                <VBox alignment="CENTER" styleClass="stat-card paper">
+                    <Label styleClass="stat-icon" text="📄" />
+                    <Label styleClass="stat-title" text="PAPIER" />
+                    <Label fx:id="statPapierValue" styleClass="stat-value" text="0 kg" />
+                </VBox>
+
+                <VBox alignment="CENTER" styleClass="stat-card organic">
+                    <Label styleClass="stat-icon" text="🍂" />
+                    <Label styleClass="stat-title" text="ORGANIQUE" />
+                    <Label fx:id="statOrganiqueValue" styleClass="stat-value" text="0 kg" />
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox alignment="CENTER" prefHeight="50" styleClass="footer">
+            <Label styleClass="footer-text" text="© 2025 Gestion Déchets  " />
+        </HBox>
+    </bottom>
+
+</BorderPane>

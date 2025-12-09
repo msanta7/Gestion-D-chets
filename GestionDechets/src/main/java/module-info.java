@@ -4,6 +4,11 @@ module com.example.gestiondechets {
     requires java.sql;
     requires java.desktop;
     requires javafx.base;
+    requires javafx.graphics;
+    requires kernel;
+    requires layout;
+    requires io;
+    requires org.apache.pdfbox;
 
 
     opens com.example.gestiondechets to javafx.fxml;

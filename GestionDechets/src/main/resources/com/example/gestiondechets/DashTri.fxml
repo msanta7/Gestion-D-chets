@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.DashTriController">
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.DashTriController">
 
     <!-- Menu latéral -->
     <AnchorPane prefWidth="220.0" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -53,16 +53,17 @@
         <Label style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Tableau de Bord - Agent de Tri" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
 
         <!-- Section Historique des Triages -->
-        <Label layoutX="30.0" layoutY="77.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Historique des Triages Récent" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="77.0" />
+        <Label layoutX="30.0" layoutY="82.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Historique des Triages Récent" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="82.0" />
 
         <!-- Tableau historique -->
-        <TableView fx:id="historiqueTable" layoutX="30.0" layoutY="117.0" prefHeight="571.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10;" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="117.0">
+        <TableView fx:id="historiqueTable" layoutX="119.0" layoutY="129.0" prefHeight="475.0" prefWidth="743.0" style="-fx-background-color: white; -fx-background-radius: 10;" AnchorPane.bottomAnchor="96.0" AnchorPane.leftAnchor="119.0" AnchorPane.rightAnchor="118.0" AnchorPane.topAnchor="129.0">
             <columns>
-                <TableColumn fx:id="idTriageCol" prefWidth="80.0" text="ID" />
-                <TableColumn fx:id="dateTriageCol" prefWidth="150.0" text="Date Triage" />
-                <TableColumn fx:id="typeDechetCol" prefWidth="150.0" text="Type Déchet" />
-                <TableColumn fx:id="quantiteCol" prefWidth="120.0" text="Quantité (kg)" />
-                <TableColumn fx:id="statutTriageCol" prefWidth="120.0" text="Statut" />
+                <TableColumn fx:id="idAgentCol" prefWidth="150.0" text="Agent" />
+                <TableColumn fx:id="idTriageCol" prefWidth="80.0" text="ID Déchet" />
+                <TableColumn fx:id="typeDechetCol" prefWidth="120.0" text="Type Déchet" />
+                <TableColumn fx:id="quantiteCol" prefWidth="100.0" text="Quantité (kg)" />
+                <TableColumn fx:id="statutTriageCol" prefWidth="100.0" text="Toxicité" />
+                <TableColumn fx:id="dateTriageCol" prefWidth="192.0" text="Date Triage" />
             </columns>
         </TableView>
 

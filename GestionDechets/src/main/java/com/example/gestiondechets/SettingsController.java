@@ -101,6 +101,8 @@ public class SettingsController {
                     e.printStackTrace();
                     showError("Erreur lors du chargement de la page de connexion : " + e.getMessage());
                 }
+                Database.logoutUserByPhone(Database.getActiveUser().getTelephone());
+
             }
         });
     }

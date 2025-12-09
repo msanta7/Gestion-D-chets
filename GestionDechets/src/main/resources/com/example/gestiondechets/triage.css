@@ -1,0 +1,278 @@
+/* Main Theme Colors */
+.root {
+    -primary-color: #2E7D32;
+    -primary-dark: #1B5E20;
+    -primary-light: #4CAF50;
+    -secondary-color: #546E7A;
+    -background-color: #F5F5F5;
+    -card-color: #FFFFFF;
+    -text-primary: #212121;
+    -text-secondary: #757575;
+    -error-color: #D32F2F;
+    -success-color: #388E3C;
+    -warning-color: #F57C00;
+    -border-color: #E0E0E0;
+}
+
+/* Top Navigation */
+.top-nav {
+    -fx-background-color: -primary-color;
+    -fx-padding: 0 30px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.app-title {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.2), 0, 0, 0, 1);
+}
+
+.nav-btn {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+.nav-btn.active {
+    -fx-background-color: rgba(255,255,255,0.2);
+    -fx-font-weight: bold;
+}
+
+.logout-btn {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-background-color: -primary-dark;
+    -fx-padding: 8px 20px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #1A472A;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+/* Main Container */
+.main-container {
+    -fx-padding: 30px;
+    -fx-background-color: -background-color;
+}
+
+/* Section Header */
+.section-header {
+    -fx-padding: 0 0 10px 0;
+}
+
+.section-title {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.remaining-label {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary-color;
+    -fx-padding: 8px 15px;
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: -primary-light;
+    -fx-border-width: 1px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+/* Form Card */
+.form-card {
+    -fx-background-color: -card-color;
+    -fx-padding: 30px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 2);
+    -fx-border-color: -border-color;
+    -fx-border-width: 1px;
+}
+
+.form-label {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -text-primary;
+}
+
+.form-choicebox {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: white;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px;
+}
+
+.form-choicebox:hover {
+    -fx-border-color: -primary-light;
+}
+
+.form-textfield {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: white;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px;
+}
+
+.form-textfield:focused {
+    -fx-border-color: -primary-color;
+    -fx-effect: dropshadow(three-pass-box, rgba(46,125,50,0.2), 5, 0, 0, 0);
+}
+
+.unit-label {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-secondary;
+    -fx-padding: 8px 0;
+}
+
+/* Buttons */
+.primary-btn {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: white;
+    -fx-background-color: -primary-color;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(46,125,50,0.3), 5, 0, 0, 1);
+}
+
+.primary-btn:hover {
+    -fx-background-color: -primary-dark;
+    -fx-effect: dropshadow(three-pass-box, rgba(46,125,50,0.4), 8, 0, 0, 2);
+}
+
+.secondary-btn {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -text-primary;
+    -fx-background-color: transparent;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: -text-secondary;
+}
+
+/* Stats Cards */
+.stats-container {
+    -fx-padding: 20px 0;
+}
+
+.stat-card {
+    -fx-background-color: -card-color;
+    -fx-padding: 20px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);
+    -fx-pref-width: 120px;
+    -fx-spacing: 10px;
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+}
+
+.stat-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 2);
+    -fx-translate-y: -2px;
+    -fx-cursor: hand;
+}
+
+.stat-card.plastic {
+    -fx-border-color: #2196F3;
+}
+
+.stat-card.glass {
+    -fx-border-color: #9C27B0;
+}
+
+.stat-card.metal {
+    -fx-border-color: #FF9800;
+}
+
+.stat-card.paper {
+    -fx-border-color: #4CAF50;
+}
+
+.stat-card.organic {
+    -fx-border-color: #795548;
+}
+
+.stat-icon {
+    -fx-font-size: 32px;
+    -fx-padding: 0 0 5px 0;
+}
+
+.stat-title {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-secondary;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+.stat-value {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+/* Footer */
+.footer {
+    -fx-background-color: -secondary-color;
+    -fx-padding: 0 30px;
+}
+
+.footer-text {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-opacity: 0.8;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .stats-container {
+        -fx-wrap-text: true;
+        -fx-alignment: center;
+    }
+    
+    .stat-card {
+        -fx-pref-width: 100px;
+    }
+}

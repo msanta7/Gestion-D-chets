@@ -2,16 +2,14 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.TriageDechetsController">
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gestiondechets.ListeCollectesController">
 
     <!-- Menu latéral -->
     <AnchorPane prefWidth="220.0" style="-fx-background-color: #006666;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -51,26 +49,11 @@
     <!-- Contenu principal -->
     <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-        <!-- Header -->
-        <Label style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Trier les Déchets - Agent de Tri" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
-
         <!-- Formulaire de triage -->
-        <AnchorPane layoutX="30.0" layoutY="80.0" prefHeight="120.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="80.0">
-
-            <!-- Type de déchet -->
-            <Label layoutX="20.0" layoutY="20.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Type de Déchet" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
-            <ComboBox fx:id="typeDechetCombo" layoutX="20.0" layoutY="45.0" prefWidth="250.0" promptText="Sélectionner un type" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="45.0" />
-
-            <!-- Quantité -->
-            <Label layoutX="300.0" layoutY="20.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 16px; -fx-font-weight: bold;" text="Quantité (kg)" AnchorPane.leftAnchor="300.0" AnchorPane.topAnchor="20.0" />
-            <TextField fx:id="quantiteField" layoutX="300.0" layoutY="45.0" prefWidth="250.0" promptText="Ex: 45.5" AnchorPane.leftAnchor="300.0" AnchorPane.topAnchor="45.0">
-                <padding>
-                    <Insets left="10.0" right="10.0" />
-                </padding>
-            </TextField>
+        <AnchorPane layoutX="30.0" layoutY="77.0" prefHeight="123.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="77.0">
 
             <!-- Bouton Ajouter -->
-            <Button layoutX="629.0" layoutY="35.0" onAction="#ajouterTriage" prefHeight="40.0" prefWidth="250.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="➕ Ajouter au Triage" AnchorPane.leftAnchor="629.0" AnchorPane.topAnchor="35.0">
+            <Button fx:id="btnTrier" graphicTextGap="0.0" layoutX="24.0" layoutY="70.0" onAction="#ajouterTriage" prefHeight="35.0" prefWidth="873.0" style="-fx-background-color: #27ae60; -fx-background-radius: 5; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Trier" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="70.0">
                 <padding>
                     <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                 </padding>
@@ -81,15 +64,16 @@
         <!-- Liste des déchets à trier -->
         <Label layoutX="37.0" layoutY="218.0" style="-fx-text-fill: #2c3e50; -fx-font-size: 20px; -fx-font-weight: bold;" text="Liste des Déchets à Trier" AnchorPane.leftAnchor="37.0" AnchorPane.topAnchor="218.0" />
 
-        <TableView fx:id="triageTable" layoutX="37.0" layoutY="258.0" prefHeight="401.0" prefWidth="920.0" style="-fx-background-color: white; -fx-background-radius: 10;" AnchorPane.leftAnchor="37.0" AnchorPane.rightAnchor="23.0" AnchorPane.topAnchor="258.0">
+        <TableView fx:id="triageTable" layoutX="178.0" layoutY="258.0" prefHeight="401.0" prefWidth="641.0" style="-fx-background-color: white; -fx-background-radius: 10;" AnchorPane.leftAnchor="178.0" AnchorPane.rightAnchor="161.0" AnchorPane.topAnchor="258.0">
             <columns>
-                <TableColumn fx:id="colType" prefWidth="200.0" text="Type de Déchet" />
-                <TableColumn fx:id="colQuantite" prefWidth="150.0" text="Quantité (kg)" />
-                <TableColumn fx:id="colLot" prefWidth="200.0" text="Numéro de Lot" />
-                <TableColumn fx:id="colStatut" prefWidth="150.0" text="Statut" />
-                <TableColumn fx:id="colActions" prefWidth="200.0" text="Actions" />
+                <TableColumn fx:id="colNcollecte" prefWidth="243.0" text="N° collecte" />
+                <TableColumn fx:id="colQuantite" prefWidth="240.0" text="Quantité (kg)" />
+                <TableColumn fx:id="colStatut" prefWidth="157.0" text="Statut" />
             </columns>
         </TableView>
+
+           <!-- Header -->
+        <Label layoutX="51.0" layoutY="25.0" style="-fx-text-fill: #006666; -fx-font-size: 28px; -fx-font-weight: bold;" text="Trier les Déchets - Agent de Tri" AnchorPane.leftAnchor="51.0" AnchorPane.topAnchor="25.0" />
 
     </AnchorPane>
 
